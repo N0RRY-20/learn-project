@@ -10,7 +10,7 @@ import AuthLayout from '@/layouts/auth-layout';
 
 export default function Register() {
     return (
-        <AuthLayout title="Create an account" description="Enter your details below to create your account">
+        <AuthLayout title="Daftarkan akun" description="masukkan input di bawah">
             <Head title="Register" />
             <Form
                 method="post"
@@ -22,6 +22,7 @@ export default function Register() {
                 {({ processing, errors }) => (
                     <>
                         <div className="grid gap-6">
+                            {/* name */}
                             <div className="grid gap-2">
                                 <Label htmlFor="name">Name</Label>
                                 <Input
@@ -36,7 +37,7 @@ export default function Register() {
                                 />
                                 <InputError message={errors.name} className="mt-2" />
                             </div>
-
+                            {/* email */}
                             <div className="grid gap-2">
                                 <Label htmlFor="email">Email address</Label>
                                 <Input
@@ -50,7 +51,7 @@ export default function Register() {
                                 />
                                 <InputError message={errors.email} />
                             </div>
-
+                            {/* password */}
                             <div className="grid gap-2">
                                 <Label htmlFor="password">Password</Label>
                                 <Input
@@ -64,7 +65,7 @@ export default function Register() {
                                 />
                                 <InputError message={errors.password} />
                             </div>
-
+                            {/* confirm password */}
                             <div className="grid gap-2">
                                 <Label htmlFor="password_confirmation">Confirm password</Label>
                                 <Input
@@ -78,7 +79,7 @@ export default function Register() {
                                 />
                                 <InputError message={errors.password_confirmation} />
                             </div>
-
+                            {/* button */}
                             <Button type="submit" className="mt-2 w-full" tabIndex={5}>
                                 {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                                 Create account

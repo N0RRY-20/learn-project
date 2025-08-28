@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import { BookOpen, Clipboard, DatabaseIcon, Folder, GraduationCap, LayoutGrid, UserCheck2 } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -13,6 +13,37 @@ const mainNavItems: NavItem[] = [
         href: '/dashboard',
         icon: LayoutGrid,
     },
+    {
+        title: 'Data Master',
+        href: '#',
+        icon: DatabaseIcon,
+        children: [
+            {
+                title: 'Data Asatidzah',
+                href: '#',
+                icon: UserCheck2,
+            },
+            {
+                title: 'Data Santri/Santriwati',
+                href: '#',
+                icon: GraduationCap,
+            },
+        ],
+    },
+    {
+        title: 'Menu Tahfidz',
+        href: '#',
+        icon: BookOpen,
+        children: [
+            {
+                title: 'Data Halaqah',
+                href: '#',
+                icon: Clipboard,
+            },
+        ],
+    },
+
+    // tinggal tambahkan sesuatu kalo mau navitem disini, sangat mudah
 ];
 
 const footerNavItems: NavItem[] = [
@@ -26,6 +57,7 @@ const footerNavItems: NavItem[] = [
         href: 'https://laravel.com/docs/starter-kits#react',
         icon: BookOpen,
     },
+    // sama hallnya seperti disini
 ];
 
 export function AppSidebar() {
