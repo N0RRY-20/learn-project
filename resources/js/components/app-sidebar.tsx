@@ -2,48 +2,58 @@ import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
-import { BookOpen, Clipboard, DatabaseIcon, Folder, GraduationCap, LayoutGrid, UserCheck2 } from 'lucide-react';
+import { Auth, type NavGroup, type NavItem } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
+import { BombIcon, BookOpen, Folder, LayoutGrid, User, User2Icon } from 'lucide-react';
 import AppLogo from './app-logo';
 
-const mainNavItems: NavItem[] = [
+const sidebarNavGroups: NavGroup[] = [
     {
         title: 'Dashboard',
-        href: '/dashboard',
-        icon: LayoutGrid,
+        items: [
+            {
+                title: 'Dashboard',
+                href: '/dashboard',
+                icon: LayoutGrid,
+            },
+        ],
     },
     {
         title: 'Data Master',
-        href: '#',
-        icon: DatabaseIcon,
-        children: [
+        roles: ['Admin'],
+        items: [
             {
-                title: 'Data Asatidzah',
-                href: '#',
-                icon: UserCheck2,
+                title: 'Data Guru',
+                href: route('teachersData'),
+                icon: User,
+                roles: ['Admin'],
             },
             {
                 title: 'Data Santri/Santriwati',
-                href: '#',
-                icon: GraduationCap,
+                href: '/dashboard',
+                icon: User2Icon,
             },
         ],
     },
     {
         title: 'Menu Tahfidz',
-        href: '#',
-        icon: BookOpen,
-        children: [
+        items: [
             {
                 title: 'Data Halaqah',
-                href: '#',
-                icon: Clipboard,
+                href: '/dashboard', // Pastikan `route` tersedia
+                icon: BookOpen,
+                roles: ['Admin'],
             },
+            {
+                title: 'target hafalan',
+                href: '/dashboard', // Pastikan `route` tersedia
+                icon: BombIcon,
+                roles: ['Guru Halaqah'],
+            },
+
+            // Tambahkan item lain untuk grup ini jika ada
         ],
     },
-
-    // tinggal tambahkan sesuatu kalo mau navitem disini, sangat mudah
 ];
 
 const footerNavItems: NavItem[] = [
@@ -61,6 +71,27 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
+    // 1. Dapatkan role pengguna saat ini
+    const { auth } = usePage<{ auth: Auth }>().props;
+    const userRole = auth.user.roles.map((r: any) => r.name);
+
+    // 2. Logika untuk memfilter navigasi
+    const filteredNavGroups = sidebarNavGroups
+        .map((group) => {
+            // Cek apakah grup ini boleh diakses oleh userRole
+            const isGroupVisible = !group.roles || group.roles.some((roles) => userRole.includes(roles));
+
+            if (!isGroupVisible) {
+                return null; // Jika grup tidak boleh diakses, buang
+            }
+
+            // Jika grup boleh diakses, filter item di dalamnya
+            const filteredItems = group.items.filter((item) => !item.roles || item.roles.some((roles) => userRole.includes(roles)));
+
+            // Kembalikan grup dengan item yang sudah difilter
+            return { ...group, items: filteredItems };
+        })
+        .filter((group): group is NavGroup => group !== null && group.items.length > 0);
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -76,7 +107,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain groups={filteredNavGroups} />
             </SidebarContent>
 
             <SidebarFooter>
