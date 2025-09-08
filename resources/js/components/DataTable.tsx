@@ -20,9 +20,10 @@ import { Input } from './ui/input';
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
+    filterColumn?: string;
 }
 
-export function DataTable<TData, TValue>({ columns, data, meta }: DataTableProps<TData, TValue> & { meta?: any }) {
+export function DataTable<TData, TValue>({ columns, data, meta, filterColumn }: DataTableProps<TData, TValue> & { meta?: any }) {
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
     const table = useReactTable({
@@ -44,11 +45,12 @@ export function DataTable<TData, TValue>({ columns, data, meta }: DataTableProps
         <div>
             <div className="flex items-center justify-between py-4">
                 <Input
-                    placeholder="Cari Nama..."
-                    value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
-                    onChange={(event) => table.getColumn('name')?.setFilterValue(event.target.value)}
+                    placeholder="Cari..."
+                    value={(table.getColumn(filterColumn ?? 'name')?.getFilterValue() as string) ?? ''}
+                    onChange={(event) => table.getColumn(filterColumn ?? 'name')?.setFilterValue(event.target.value)}
                     className="max-w-sm"
                 />
+
                 <div className="mx-4 flex items-center justify-between gap-3">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>

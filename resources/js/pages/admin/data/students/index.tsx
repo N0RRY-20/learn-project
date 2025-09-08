@@ -20,7 +20,7 @@ export default function Index({ students }: Indexprops) {
     const [detailData, setDetailData] = useState<Student | null>(null);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Menu Tahfidz" />
+            <Head title="Data Santri/Santriwati" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <Link href={route('students.create')}>
                     <Button className="cursor-pointer">Tambah Santri/Santriwati</Button>

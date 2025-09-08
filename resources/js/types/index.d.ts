@@ -80,3 +80,11 @@ export interface Student {
     created_at: string;
     updated_at: string;
 }
+
+export interface DataHalaqah {
+    id: number; // BIGINT → number
+    nama_halaqah: string; // VARCHAR → string
+    teacher_id: number | null; // BIGINT NULLABLE → number atau null
+
+    teacher: Teacher; // Relasi ke tabel teachers
+}

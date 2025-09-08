@@ -45,7 +45,7 @@ const sidebarNavGroups: NavGroup[] = [
         items: [
             {
                 title: 'Data Halaqah',
-                href: '/dashboard', // Pastikan `route` tersedia
+                href: '/datahalaqah', // Pastikan `route` tersedia
                 icon: BookOpen,
                 roles: ['Admin'],
             },

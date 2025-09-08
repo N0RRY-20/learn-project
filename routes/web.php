@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\admin\DataHalaqahController;
 use App\Http\Controllers\admin\StudentController;
 use App\Http\Controllers\admin\TeachersDataController;
 use App\Http\Controllers\admin\UserDataController;
@@ -42,6 +43,14 @@ Route::middleware(['auth', 'Admin'])->group(function () {
     Route::get('/usersEdit/{user}', [UserDataController::class, 'edit'])->name('users.edit');
     Route::put('/usersUpdate/{user}', [UserDataController::class, 'update'])->name('users.update');
     Route::delete('/usersDestroy/{user}', [UserDataController::class, 'destroy'])->name('users.destroy');
+
+    // Data halaqah=====================================
+    Route::get('datahalaqah', [DataHalaqahController::class, 'index'])->name('datahalaqah.index');
+    Route::get('datahalaqahCreate', [DataHalaqahController::class, 'create'])->name('datahalaqah.create');
+    Route::post('datahalaqahStore', [DataHalaqahController::class, 'store'])->name('datahalaqah.store');
+    Route::delete('datahalaqahDestroy/{datahalaqah}', [DataHalaqahController::class, 'destroy'])->name('datahalaqah.destroy');
+    Route::get('datahalaqahEdit/{datahalaqah}', [DataHalaqahController::class, 'edit'])->name('datahalaqah.edit');
+    Route::put('datahalaqahUpdate/{datahalaqah}', [DataHalaqahController::class, 'update'])->name('datahalaqah.update');
 });
 
 require __DIR__.'/settings.php';
