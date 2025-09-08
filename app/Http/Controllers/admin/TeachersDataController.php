@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\admin;
 
+use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Models\TeachersData;
 use App\Models\User;
@@ -37,10 +38,13 @@ class TeachersDataController extends Controller
             'jenis_kelamin' => ['required', Rule::in(['Laki-Laki', 'Perempuan'])],
 
             'alamat' => 'required|string|max:500',
-            'tanggal_lahir' => 'required|date',
+            'birth_date' => 'required|date',
             'tempat_kelahiran' => 'required|string|max:255',
-
-            'no_hp' => 'nullable|string|regex:/^[0-9]{10,15}$/',
+            'no_hp' => [
+                'nullable',
+                'string',
+                'regex:/^(?:\(\+62\)|\+62|0)?[0-9\s\-]{8,16}$/',
+            ],
 
         ]);
 
@@ -54,7 +58,7 @@ class TeachersDataController extends Controller
                 'jenis_kelamin' => $validatedData['jenis_kelamin'],
 
                 'alamat' => $validatedData['alamat'],
-                'tanggal_lahir' => $validatedData['tanggal_lahir'],
+                'birth_date' => $validatedData['birth_date'],
                 'tempat_kelahiran' => $validatedData['tempat_kelahiran'],
 
                 'no_hp' => $validatedData['no_hp'],
@@ -72,6 +76,51 @@ class TeachersDataController extends Controller
         $teachersData->load('user.roles');
 
         return Inertia::render('admin/data/teachers/edit', compact('teachersData'));
+    }
+
+    public function update(Request $request, TeachersData $teachersData)
+    {
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $teachersData->user->id,
+            'password' => 'nullable|string|min:6',
+
+            'roles' => ['required', 'array', 'min:1'],
+            'roles.*' => ['required', Rule::in(['Guru Halaqah', 'Guru Mapel', 'Admin', 'Walimurid'])],
+            'jenis_kelamin' => ['required', Rule::in(['Laki-Laki', 'Perempuan'])],
+
+            'alamat' => 'required|string|max:500',
+            'birth_date' => 'required|date',
+            'tempat_kelahiran' => 'required|string|max:255',
+            'no_hp' => [
+                'nullable',
+                'string',
+                'regex:/^(?:\(\+62\)|\+62|0)?[0-9\s\-]{8,16}$/',
+            ],
+
+        ]);
+
+        DB::transaction(function () use ($validatedData, $teachersData) {
+            $teachersData->user->update([
+                'name' => $validatedData['name'],
+                'email' => $validatedData['email'],
+                'password' => $validatedData['password'] ? Hash::make($validatedData['password']) : $teachersData->user->password,
+            ]);
+            $teachersData->update([
+                'jenis_kelamin' => $validatedData['jenis_kelamin'],
+
+                'alamat' => $validatedData['alamat'],
+                'birth_date' => $validatedData['birth_date'],
+                'tempat_kelahiran' => $validatedData['tempat_kelahiran'],
+
+                'no_hp' => $validatedData['no_hp'],
+            ]);
+            $teachersData->user->roles()->sync(
+                Role::whereIn('name', $validatedData['roles'])->pluck('id')
+            );
+        });
+
+        return redirect()->route('teachersData')->with('success', 'data berhasil diupdate');
     }
 
     public function destroy(TeachersData $teachersData)

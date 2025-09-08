@@ -1,36 +1,35 @@
-import { CalendarField } from '@/components/CalendarField';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem } from '@/types';
+import { BreadcrumbItem, User } from '@/types';
 import { Form, Head } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Data Guru',
-        href: route('teachersData'),
-    },
-    {
-        title: 'Tambah Data',
-        href: route('teachers.create'),
-    },
-];
-
-export default function create() {
-    const [roles, setRoles] = useState<string[]>([]);
-
-    const [jenisKelamin, setJenisKelamin] = useState('');
+export default function edit({ user }: { user: User }) {
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Data Users',
+            href: route('usersData'),
+        },
+        {
+            title: 'Edit Data',
+            href: route('users.edit', user.id),
+        },
+        {
+            title: user.name,
+            href: '#',
+        },
+    ];
+    const [roles, setRoles] = useState<string[]>(user.roles?.map((r) => r.name) || []);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Menu Tahfidz" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <Form method="post" action={route('teachers.store')} disableWhileProcessing resetOnSuccess className="flex flex-col gap-6">
+                <Form method="put" action={route('users.update', user.id)} disableWhileProcessing resetOnSuccess className="flex flex-col gap-6">
                     {({ processing, errors }) => (
                         <>
                             <div className="grid gap-6">
@@ -45,24 +44,33 @@ export default function create() {
                                         autoComplete="name"
                                         name="name"
                                         placeholder="Full name"
+                                        defaultValue={user.name ?? ''}
                                     />
                                     <InputError message={errors.name ? 'Nama wajib diisi' : ''} className="mt-2" />
                                 </div>
                                 <div className="grid gap-2">
                                     <Label htmlFor="email">Email</Label>
-                                    <Input id="email" type="text" required tabIndex={2} autoComplete="email" name="email" placeholder="Email" />
+                                    <Input
+                                        id="email"
+                                        type="text"
+                                        required
+                                        tabIndex={2}
+                                        autoComplete="email"
+                                        name="email"
+                                        placeholder="Email"
+                                        defaultValue={user.email ?? ''}
+                                    />
                                     <InputError message={errors.email ? 'Email wajib diisi dan harus valid' : ''} className="mt-2" />
                                 </div>
                                 <div className="grid gap-2">
                                     <Label htmlFor="password">Password</Label>
-                                    <Input id="password" type="password" name="password" placeholder="Masukkan password" tabIndex={3} required />
+                                    <Input id="password" type="password" name="password" placeholder="Masukkan password" tabIndex={3} />
                                     <InputError message={errors.password ? 'Isi Password dengan benar' : ''} className="mt-2" />
                                 </div>
-
                                 <div className="grid gap-2">
                                     <Label htmlFor="roles">Peran</Label>
 
-                                    {['Guru Halaqah', 'Guru Mapel', 'Admin', 'Walimurid'].map((r) => (
+                                    {['Admin', 'Walimurid'].map((r) => (
                                         <div key={r} className="flex items-center gap-3">
                                             <Checkbox
                                                 id={r}
@@ -83,47 +91,6 @@ export default function create() {
                                     <InputError message={errors.roles ? 'Pilih minimal satu peran' : ''} className="mt-2" />
                                 </div>
 
-                                {/* Jenis Kelamin */}
-                                <div className="grid gap-2">
-                                    <Label htmlFor="jenis_kelamin">Jenis Kelamin</Label>
-                                    <RadioGroup value={jenisKelamin} onValueChange={setJenisKelamin} className="flex items-center gap-3">
-                                        {['Laki-Laki', 'Perempuan'].map((jk) => (
-                                            <div key={jk} className="flex items-center space-x-2">
-                                                <RadioGroupItem value={jk} id={jk} />
-                                                <Label htmlFor={jk}>{jk}</Label>
-                                            </div>
-                                        ))}
-                                    </RadioGroup>
-                                    <input type="hidden" name="jenis_kelamin" value={jenisKelamin} />
-                                    <InputError message={errors.jenis_kelamin ? 'Pilih jenis kelamin' : ''} className="mt-2" />
-                                </div>
-
-                                <div className="grid gap-2">
-                                    <Label htmlFor="alamat">Alamat</Label>
-                                    <Input id="alamat" type="text" name="alamat" placeholder="Alamat lengkap" tabIndex={4} required />
-                                    <InputError message={errors.alamat ? 'Alamat wajib diisi' : ''} className="mt-2" />
-                                </div>
-                                <div className="grid gap-2">
-                                    <CalendarField />
-                                </div>
-
-                                <div className="grid gap-2">
-                                    <Label htmlFor="tempat_kelahiran">Tempat Lahir</Label>
-                                    <Input
-                                        id="tempat_kelahiran"
-                                        type="text"
-                                        name="tempat_kelahiran"
-                                        placeholder="Tempat lahir"
-                                        tabIndex={5}
-                                        required
-                                    />
-                                    <InputError message={errors.tempat_kelahiran ? 'Tempat lahir wajib diisi' : ''} className="mt-2" />
-                                </div>
-                                <div className="grid gap-2">
-                                    <Label htmlFor="no_hp">No HP</Label>
-                                    <Input id="no_hp" type="text" name="no_hp" placeholder="08123456789" tabIndex={6} />
-                                    <InputError message={errors.no_hp ? 'Nomor HP wajib diisi' : ''} className="mt-2" />
-                                </div>
                                 <Button type="submit" className="mt-2 w-full" tabIndex={7} disabled={processing}>
                                     {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                                     Simpan

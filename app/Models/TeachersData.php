@@ -9,18 +9,25 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class TeachersData extends Model
 {
     use HasFactory;
-        protected $table = 'teachers_data';
-        protected $fillable = [
+
+    protected $table = 'teachers_data';
+
+    protected $fillable = [
         'user_id',
         'jenis_kelamin',
         'alamat',
-        'tanggal_lahir',
+        'birth_date',
         'tempat_kelahiran',
         'no_hp',
     ];
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class,'user_id','id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class, 'role_user');
     }
 }

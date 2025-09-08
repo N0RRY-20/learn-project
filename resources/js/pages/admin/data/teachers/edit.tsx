@@ -11,26 +11,41 @@ import { Form, Head } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'edit Guru',
-        href: '/editGuru',
-    },
-];
-
 type TeacherProps = {
     teachersData: Teacher;
 };
 
 export default function edit({ teachersData }: TeacherProps) {
-    const [roles, setRoles] = useState<string[]>([]);
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Data Guru',
+            href: route('teachersData'),
+        },
+        {
+            title: 'Edit Data',
+            href: route('teachers.edit', teachersData.id),
+        },
+        {
+            title: teachersData.user.name,
+            href: '#',
+        },
+    ];
 
-    const [jenisKelamin, setJenisKelamin] = useState('');
+    const [roles, setRoles] = useState<string[]>(teachersData.user.roles?.map((r) => r.name) || []);
+
+    const [jenisKelamin, setJenisKelamin] = useState<string>(teachersData.jenis_kelamin || '');
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Menu Tahfidz" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <Form method="post" action={route('teachers.store')} disableWhileProcessing resetOnSuccess className="flex flex-col gap-6">
+                <Form
+                    method="put"
+                    action={route('teachers.update', teachersData.id)}
+                    disableWhileProcessing
+                    resetOnSuccess
+                    className="flex flex-col gap-6"
+                >
                     {({ processing, errors }) => (
                         <>
                             <div className="grid gap-6">
@@ -66,7 +81,7 @@ export default function edit({ teachersData }: TeacherProps) {
                                 </div>
                                 <div className="grid gap-2">
                                     <Label htmlFor="password">Password</Label>
-                                    <Input id="password" type="password" name="password" placeholder="Masukkan password" tabIndex={3} required />
+                                    <Input id="password" type="password" name="password" placeholder="Masukkan password" tabIndex={3} />
                                     <InputError message={errors.password ? 'Isi Password dengan benar' : ''} className="mt-2" />
                                 </div>
 
@@ -123,7 +138,7 @@ export default function edit({ teachersData }: TeacherProps) {
                                     <InputError message={errors.alamat ? 'Alamat wajib diisi' : ''} className="mt-2" />
                                 </div>
                                 <div className="grid gap-2">
-                                    <CalendarField />
+                                    <CalendarField defaultDate={teachersData.birth_date} />
                                 </div>
 
                                 <div className="grid gap-2">

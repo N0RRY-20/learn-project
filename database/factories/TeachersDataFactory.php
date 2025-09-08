@@ -11,8 +11,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class TeachersDataFactory extends Factory
 {
+    protected $model = TeachersData::class;
 
-     protected $model = TeachersData::class;
     /**
      * Define the model's default state.
      *
@@ -20,12 +20,12 @@ class TeachersDataFactory extends Factory
      */
     public function definition(): array
     {
-         return [
+        return [
             // ambil user random yang sudah ada
             'user_id' => User::inRandomOrder()->first()->id ?? User::factory(),
             'jenis_kelamin' => $this->faker->randomElement(['Laki-Laki', 'Perempuan']),
             'alamat' => $this->faker->address,
-            'tanggal_lahir' => $this->faker->date(),
+            'birth_date' => $this->faker->date(),
             'tempat_kelahiran' => $this->faker->city,
             'no_hp' => $this->faker->phoneNumber,
         ];

@@ -7,7 +7,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Teacher } from '@/types';
+import { User } from '@/types';
 import { Link, router } from '@inertiajs/react';
 import { ColumnDef, RowData } from '@tanstack/react-table';
 import { Eye, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
@@ -18,47 +18,22 @@ declare module '@tanstack/react-table' {
     }
 }
 
-export const columns: ColumnDef<Teacher>[] = [
+export const columns: ColumnDef<User>[] = [
     {
         id: 'no',
         header: 'NO',
         cell: ({ row }) => row.index + 1,
     },
+
     {
-        accessorFn: (row) => row.user?.name,
-        id: 'name',
+        accessorKey: 'name',
         header: 'Nama',
     },
     {
-        accessorFn: (row) => row.user?.email,
-        id: 'email',
+        accessorKey: 'email',
         header: 'Email',
     },
-    {
-        accessorFn: (row) => row.user?.roles.map((r: any) => r.name).join(', '),
-        id: 'peran',
-        header: 'Peran',
-    },
-    {
-        accessorKey: 'jenis_kelamin',
-        header: 'Jenis Kelamin',
-    },
-    {
-        accessorKey: 'no_hp',
-        header: 'No HP',
-    },
-    {
-        accessorKey: 'alamat',
-        header: 'Alamat',
-    },
-    {
-        accessorKey: 'birth_date',
-        header: 'Tanggal Lahir',
-    },
-    {
-        accessorKey: 'tempat_kelahiran',
-        header: 'Tempat Kelahiran',
-    },
+    { accessorFn: (row) => row.roles.map((r: any) => r.name).join(', '), id: 'peran', header: 'Peran' },
 
     // Actions column
     {
@@ -86,7 +61,7 @@ export const columns: ColumnDef<Teacher>[] = [
 
                         {/* Edit */}
                         <DropdownMenuItem asChild>
-                            <Link href={route('teachers.edit', row.original.id)} className="flex items-center gap-2">
+                            <Link href={route('users.edit', row.original.id)} className="flex items-center gap-2">
                                 <Pencil className="h-4 w-4" />
                                 Edit
                             </Link>
@@ -96,7 +71,7 @@ export const columns: ColumnDef<Teacher>[] = [
                         <DropdownMenuItem
                             onClick={() => {
                                 if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
-                                    router.delete(route('teachers.destroy', row.original.id));
+                                    router.delete(route('users.destroy', row.original.id));
                                 }
                             }}
                             className="flex cursor-pointer items-center gap-2 text-red-500"

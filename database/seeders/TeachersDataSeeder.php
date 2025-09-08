@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\TeachersData;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class TeachersDataSeeder extends Seeder
@@ -13,6 +12,6 @@ class TeachersDataSeeder extends Seeder
      */
     public function run(): void
     {
-         TeachersData::factory()->count(50)->create();
+        TeachersData::factory()->count(3)->create();
     }
 }

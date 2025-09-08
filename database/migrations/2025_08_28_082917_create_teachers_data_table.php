@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('teachers_data', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->enum('jenis_kelamin',['Laki-Laki','Perempuan']);
+            $table->enum('jenis_kelamin', ['Laki-Laki', 'Perempuan']);
             $table->string('alamat');
-            $table->date('tanggal_lahir');
+            $table->date('birth_date');
             $table->string('tempat_kelahiran');
-            $table->string('no_hp',20)->nullable();
+            $table->string('no_hp', 20)->nullable();
             $table->timestamps();
         });
     }

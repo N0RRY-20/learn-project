@@ -17,32 +17,34 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory(30)->create();
-        TeachersData::factory(30)->create();
 
+        // $this->call([
+        //     StudentSeeder::class,
+        // ]);
+        // User::factory(3)->create();
+        // TeachersData::factory(3)->create();
 
-    DB::table('roles')->insert([
+        DB::table('roles')->insert([
             ['name' => 'Admin'],
             ['name' => 'Guru Halaqah'],
             ['name' => 'Guru Mapel'],
             ['name' => 'Walimurid'],
         ]);
-       
 
-     $userId =  DB::table('users')->insertGetId([
+        $userId = DB::table('users')->insertGetId([
             'name' => 'Nory',
             'email' => 'nory@exa.com',
             'password' => Hash::make('password'), // jangan simpan plain text!
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-        
-        $role = Role::where('name','Admin')->first();
+
+        $role = Role::where('name', 'Admin')->first();
 
         DB::table('role_user')->insert([
-             'user_id' => $userId,
-            'role_id' => $role -> id,
-           
+            'user_id' => $userId,
+            'role_id' => $role->id,
+
         ]);
     }
 }

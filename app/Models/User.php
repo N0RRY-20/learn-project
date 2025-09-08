@@ -47,13 +47,14 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-    
-public function teacherData(): HasOne
-{
-    return $this->hasOne(TeachersData::class, 'user_id', 'id');
-}
 
-public function roles(){
-    return $this->belongsToMany(Role::class, 'role_user');
-} 
+    public function teacherData(): HasOne
+    {
+        return $this->hasOne(TeachersData::class, 'user_id', 'id');
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class, 'role_user');
+    }
 }

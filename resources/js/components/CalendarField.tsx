@@ -8,9 +8,9 @@ import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as Celender } from 'lucide-react';
 
-export function CalendarField() {
+export function CalendarField({ defaultDate }: { defaultDate?: string }) {
     const [open, setOpen] = React.useState(false);
-    const [date, setDate] = React.useState<Date | undefined>(undefined);
+    const [date, setDate] = React.useState<Date | undefined>(defaultDate ? new Date(defaultDate) : undefined);
 
     const format = (d?: Date) => {
         if (!d) return '';
@@ -43,7 +43,7 @@ export function CalendarField() {
                     />
                 </PopoverContent>
             </Popover>
-            <input type="hidden" name="tanggal_lahir" value={format(date)} required />
+            <input type="hidden" name="birth_date" value={format(date)} required />
         </div>
     );
 }

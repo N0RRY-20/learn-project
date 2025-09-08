@@ -7,57 +7,58 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Teacher } from '@/types';
+import { Student } from '@/types';
 import { Link, router } from '@inertiajs/react';
 import { ColumnDef, RowData } from '@tanstack/react-table';
 import { Eye, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
 
 declare module '@tanstack/react-table' {
     interface TableMeta<TData extends RowData> {
-        setDetailData?: (teacher: TData) => void;
+        setDetailData?: (student: TData) => void;
     }
 }
 
-export const columns: ColumnDef<Teacher>[] = [
+export const columns: ColumnDef<Student>[] = [
     {
         id: 'no',
         header: 'NO',
         cell: ({ row }) => row.index + 1,
     },
     {
-        accessorFn: (row) => row.user?.name,
-        id: 'name',
-        header: 'Nama',
+        accessorKey: 'name',
+        header: 'Nama Lengkap',
     },
     {
-        accessorFn: (row) => row.user?.email,
-        id: 'email',
-        header: 'Email',
+        accessorKey: 'nisn',
+        header: 'NISN',
     },
     {
-        accessorFn: (row) => row.user?.roles.map((r: any) => r.name).join(', '),
-        id: 'peran',
-        header: 'Peran',
+        accessorKey: 'class_level',
+        header: 'Tingkat Kelas',
     },
     {
-        accessorKey: 'jenis_kelamin',
+        accessorKey: 'gender',
         header: 'Jenis Kelamin',
-    },
-    {
-        accessorKey: 'no_hp',
-        header: 'No HP',
-    },
-    {
-        accessorKey: 'alamat',
-        header: 'Alamat',
     },
     {
         accessorKey: 'birth_date',
         header: 'Tanggal Lahir',
     },
     {
-        accessorKey: 'tempat_kelahiran',
-        header: 'Tempat Kelahiran',
+        accessorKey: 'address',
+        header: 'Alamat',
+    },
+    {
+        accessorKey: 'parent_name',
+        header: 'Nama Orang Tua',
+    },
+    {
+        accessorKey: 'phone_number',
+        header: 'No HP',
+    },
+    {
+        accessorKey: 'parent_occupation',
+        header: 'Pekerjaan Orang Tua',
     },
 
     // Actions column
@@ -86,7 +87,7 @@ export const columns: ColumnDef<Teacher>[] = [
 
                         {/* Edit */}
                         <DropdownMenuItem asChild>
-                            <Link href={route('teachers.edit', row.original.id)} className="flex items-center gap-2">
+                            <Link href={route('students.edit', row.original.id)} className="flex items-center gap-2">
                                 <Pencil className="h-4 w-4" />
                                 Edit
                             </Link>
@@ -96,7 +97,7 @@ export const columns: ColumnDef<Teacher>[] = [
                         <DropdownMenuItem
                             onClick={() => {
                                 if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
-                                    router.delete(route('teachers.destroy', row.original.id));
+                                    router.delete(route('students.destroy', row.original.id));
                                 }
                             }}
                             className="flex cursor-pointer items-center gap-2 text-red-500"
