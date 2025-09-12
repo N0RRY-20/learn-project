@@ -3,8 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Role;
-use App\Models\TeachersData;
-use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -20,16 +18,13 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             StudentSeeder::class,
+            SurahSeeder::class,
+            SurahAyahJuzSeeder::class,
+            RoleSeeder::class,
+            TeachersDataSeeder::class,
         ]);
         // User::factory(3)->create();
         // TeachersData::factory(3)->create();
-
-        DB::table('roles')->insert([
-            ['name' => 'Admin'],
-            ['name' => 'Guru Halaqah'],
-            ['name' => 'Guru Mapel'],
-            ['name' => 'Walimurid'],
-        ]);
 
         $userId = DB::table('users')->insertGetId([
             'name' => 'Nory',

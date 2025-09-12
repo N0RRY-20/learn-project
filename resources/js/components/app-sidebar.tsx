@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { Auth, roles, type NavGroup, type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BombIcon, BookOpen, Folder, GraduationCap, LayoutGrid, LucideBinoculars, LucideNotebookPen, UserCheck2Icon } from 'lucide-react';
+import { BookOpen, Folder, GraduationCap, LayoutGrid, LucideBinoculars, LucideNotebookPen, Target, UserCheck2Icon } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const sidebarNavGroups: NavGroup[] = [
@@ -52,7 +52,7 @@ const sidebarNavGroups: NavGroup[] = [
             {
                 title: 'target hafalan',
                 href: '/dashboard', // Pastikan `route` tersedia
-                icon: BombIcon,
+                icon: Target,
                 roles: ['Guru Halaqah'],
             },
 
@@ -66,6 +66,7 @@ const sidebarNavGroups: NavGroup[] = [
                 title: 'Data Kelas',
                 href: '/datakelas',
                 icon: LucideBinoculars,
+                roles: ['Admin'],
             },
         ],
     },
