@@ -3,38 +3,37 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem, DataHalaqah, PageProps, Student, Teacher } from '@/types';
+import { BreadcrumbItem, DataKelas, PageProps, Student, Teacher } from '@/types'; // Pastikan tipe Student sudah ada
 import { Head, useForm } from '@inertiajs/react';
 import { LoaderCircle, PlusCircle, XCircle } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Data Halaqah',
-        href: route('datahalaqah.index'),
+        title: 'Data Kelas',
+        href: route('datakelas.index'), // Sesuaikan dengan route Anda
     },
     {
-        title: 'Tambah Data',
-        href: '#',
+        title: 'Tambah Data Kelas',
+        href: route('datakelas.create'), // Sesuaikan dengan route Anda
     },
 ];
 
-// Definisikan tipe props yang akan diterima dari controller
 type EditProps = PageProps & {
-    datahalaqah: DataHalaqah & {
+    dataKelas: DataKelas & {
         students: Student[];
     };
     availableStudents: Student[]; // Siswa yang bisa dipilih
     teachers: Teacher[];
 };
-export default function Edit({ datahalaqah, availableStudents, teachers }: EditProps) {
+
+export default function Edit({ dataKelas, availableStudents, teachers }: EditProps) {
     const { data, setData, post, processing, errors } = useForm({
-        nama_halaqah: datahalaqah.nama_halaqah || '',
-        teacher_id: datahalaqah.teacher_id || '',
-        // State untuk siswa akan menjadi array of objects
-        // Kita mulai dengan satu baris siswa kosong
-        students: datahalaqah.students.length > 0 ? datahalaqah.students.map((s) => ({ student_id: s.id.toString() })) : [{ student_id: '' }],
+        nama_kelas: dataKelas.nama_kelas || '',
+        waliKelas_id: dataKelas.waliKelas_id,
+        students: dataKelas.students.length > 0 ? dataKelas.students.map((s) => ({ student_id: s.id.toString() })) : [{ student_id: '' }],
     });
 
+    // Fungsi untuk menangani perubahan pada dropdown siswa
     const handleStudentChange = (index: number, student_id: string) => {
         const updatedStudents = [...data.students];
         updatedStudents[index] = { student_id };
@@ -52,42 +51,43 @@ export default function Edit({ datahalaqah, availableStudents, teachers }: EditP
         setData('students', filteredStudents);
     };
 
+    // Fungsi untuk menangani submit form
+    const submit = (e: React.FormEvent) => {
+        e.preventDefault();
+        post(route('datakelas.update', dataKelas.id)); // Sesuaikan dengan route Anda
+    };
+
+    // Filter siswa yang sudah dipilih agar tidak muncul lagi di dropdown lain
     const getAvailableStudents = () => {
         const selectedStudentIds = data.students.map((s) => s.student_id).filter(Boolean);
         return availableStudents.filter((student) => !selectedStudentIds.includes(student.id.toString()));
     };
-
-    const submit = (e: React.FormEvent) => {
-        e.preventDefault();
-        post(route('datahalaqah.update', datahalaqah.id)); // Sesuaikan dengan route Anda
-    };
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Menu Tahfidz" />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+            <Head title="Edit Data Kelas" />
+            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl bg-white p-4 dark:bg-gray-800">
                 <form onSubmit={submit} className="flex flex-col gap-6">
+                    {/* Input untuk Nama Kelas */}
                     <div className="grid gap-2">
-                        <Label htmlFor="nama_halaqah">Nama Halaqah</Label>
+                        <Label htmlFor="nama_kelas">Nama Kelas</Label>
                         <Input
-                            id="nama_halaqah"
+                            id="nama_kelas"
                             type="text"
                             required
                             autoFocus
-                            value={data.nama_halaqah}
-                            onChange={(e) => setData('nama_halaqah', e.target.value)}
-                            placeholder="Contoh: Halaqah umar bn khottob"
+                            value={data.nama_kelas}
+                            onChange={(e) => setData('nama_kelas', e.target.value)}
+                            placeholder="Contoh: Kelas 7A"
                         />
-                        <InputError message={errors.nama_halaqah} className="mt-2" />
+                        <InputError message={errors.nama_kelas} className="mt-2" />
                     </div>
-
                     <div className="grid gap-2">
-                        <Label htmlFor="teacher_id">Wali Kelas</Label>
+                        <Label htmlFor="waliKelas_id">Wali Kelas</Label>
                         <select
-                            id="teacher_id"
-                            name="teacher_id"
-                            value={data.teacher_id}
-                            onChange={(e) => setData('teacher_id', e.target.value)}
+                            id="waliKelas_id"
+                            name="waliKelas_id"
+                            value={data.waliKelas_id ?? ''}
+                            onChange={(e) => setData('waliKelas_id', Number(e.target.value))}
                             required
                             tabIndex={2}
                             className="w-full rounded-md border border-gray-300 p-2"
@@ -99,9 +99,10 @@ export default function Edit({ datahalaqah, availableStudents, teachers }: EditP
                                 </option>
                             ))}
                         </select>
-                        <InputError message={errors.teacher_id} className="mt-2" />
+                        <InputError message={errors.waliKelas_id} className="mt-2" />
                     </div>
 
+                    {/* Bagian dinamis untuk menambah siswa */}
                     <div className="grid gap-4">
                         <Label>Siswa</Label>
                         {data.students.map((student, index) => (
@@ -151,49 +152,6 @@ export default function Edit({ datahalaqah, availableStudents, teachers }: EditP
                         Simpan
                     </Button>
                 </form>
-                {/* {({ processing, errors }) => (
-                        <>
-                            <div className="grid gap-6">
-                                <div className="grid gap-2">
-                                    <Label htmlFor="nama_halaqah">Nama Halaqah</Label>
-                                    <Input
-                                        id="nama_halaqah"
-                                        type="text"
-                                        required
-                                        autoFocus
-                                        tabIndex={1}
-                                        autoComplete="nama_halaqah"
-                                        name="nama_halaqah"
-                                        placeholder="Nama Halaqah"
-                                    />
-                                    <InputError message={errors.nama_halaqah ? 'wajib diisi' : ''} className="mt-2" />
-                                </div>
-                                <div className="grid gap-2">
-                                    <Label htmlFor="teacher_id">Pembimbing</Label>
-                                    <select
-                                        id="teacher_id"
-                                        name="teacher_id"
-                                        required
-                                        tabIndex={2}
-                                        className="w-full rounded-md border border-gray-300 p-2"
-                                    >
-                                        <option value="">-- Pilih Pembimbing --</option>
-                                        {teachers.map((teacher) => (
-                                            <option key={teacher.id} value={teacher.id}>
-                                                {teacher.user.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <InputError message={errors.teacher_id ? ' wajib diisi ' : ''} className="mt-2" />
-                                </div>
-
-                                <Button type="submit" className="mt-2 w-full" tabIndex={3} disabled={processing}>
-                                    {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                                    Simpan
-                                </Button>
-                            </div>
-                        </>
-                    )} */}
             </div>
         </AppLayout>
     );

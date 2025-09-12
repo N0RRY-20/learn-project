@@ -13,6 +13,6 @@ class StudentSeeder extends Seeder
     public function run(): void
     {
         // Panggil factory dan bilang: "Tolong buatkan 20 data siswa!"
-        Student::factory(3)->create();
+        Student::factory(20)->create();
     }
 }

@@ -16,7 +16,7 @@ class StudentFactory extends Factory
         return [
             'name' => $this->faker->name(),
             'nisn' => $this->faker->unique()->numerify('##########'), // 10 digit angka unik
-            'class_level' => $this->faker->randomElement(['X IPA 1', 'XI IPS 2', 'XII RPL 3']),
+
             'birth_date' => $this->faker->dateTimeBetween('-18 years', '-15 years'),
             'gender' => $this->faker->randomElement(['Laki-laki', 'Perempuan']),
             'address' => $this->faker->address(),

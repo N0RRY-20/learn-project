@@ -2,9 +2,9 @@ import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { Auth, type NavGroup, type NavItem } from '@/types';
+import { Auth, roles, type NavGroup, type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BombIcon, BookOpen, Folder, GraduationCap, LayoutGrid, LucideNotebookPen, UserCheck2Icon } from 'lucide-react';
+import { BombIcon, BookOpen, Folder, GraduationCap, LayoutGrid, LucideBinoculars, LucideNotebookPen, UserCheck2Icon } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const sidebarNavGroups: NavGroup[] = [
@@ -59,6 +59,16 @@ const sidebarNavGroups: NavGroup[] = [
             // Tambahkan item lain untuk grup ini jika ada
         ],
     },
+    {
+        title: 'Menu KBM',
+        items: [
+            {
+                title: 'Data Kelas',
+                href: '/datakelas',
+                icon: LucideBinoculars,
+            },
+        ],
+    },
 ];
 
 const footerNavItems: NavItem[] = [
@@ -78,7 +88,7 @@ const footerNavItems: NavItem[] = [
 export function AppSidebar() {
     // 1. Dapatkan role pengguna saat ini
     const { auth } = usePage<{ auth: Auth }>().props;
-    const userRole = auth.user.roles.map((r: any) => r.name);
+    const userRole = auth.user.roles.map((r: roles) => r.name);
 
     // 2. Logika untuk memfilter navigasi
     const filteredNavGroups = sidebarNavGroups

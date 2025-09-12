@@ -26,4 +26,9 @@ class DataHalaqah extends Model
     {
         return $this->belongsTo(TeachersData::class, 'teacher_id');
     }
+
+    public function students()
+    {
+        return $this->hasMany(Student::class, 'halaqah_id');
+    }
 }

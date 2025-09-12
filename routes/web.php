@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\admin\DataHalaqahController;
+use App\Http\Controllers\admin\DataKelasController;
 use App\Http\Controllers\admin\StudentController;
 use App\Http\Controllers\admin\TeachersDataController;
 use App\Http\Controllers\admin\UserDataController;
@@ -50,7 +51,16 @@ Route::middleware(['auth', 'Admin'])->group(function () {
     Route::post('datahalaqahStore', [DataHalaqahController::class, 'store'])->name('datahalaqah.store');
     Route::delete('datahalaqahDestroy/{datahalaqah}', [DataHalaqahController::class, 'destroy'])->name('datahalaqah.destroy');
     Route::get('datahalaqahEdit/{datahalaqah}', [DataHalaqahController::class, 'edit'])->name('datahalaqah.edit');
-    Route::put('datahalaqahUpdate/{datahalaqah}', [DataHalaqahController::class, 'update'])->name('datahalaqah.update');
+    Route::post('datahalaqahUpdate/{datahalaqah}', [DataHalaqahController::class, 'update'])->name('datahalaqah.update');
+    Route::get('datahalaqahShow/{datahalaqah}', [DataHalaqahController::class, 'show'])->name('datahalaqah.show');
+
+    // data kelas=============
+    Route::get('datakelas', [DataKelasController::class, 'index'])->name('datakelas.index');
+    Route::get('datakelasCreate', [DataKelasController::class, 'create'])->name('datakelas.create');
+    Route::post('datakelasStore', [DataKelasController::class, 'store'])->name('datakelas.store');
+    Route::get('datakelasEdit/{dataKelas}', [DataKelasController::class, 'edit'])->name('datakelas.edit');
+    Route::post('datakelasUpdate/{dataKelas}', [DataKelasController::class, 'update'])->name('datakelas.update');
+    Route::delete('datakelasDestroy/{dataKelas}', [DataKelasController::class, 'destroy'])->name('datakelas.destroy');
 });
 
 require __DIR__.'/settings.php';

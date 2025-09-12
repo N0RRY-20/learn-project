@@ -13,7 +13,7 @@ export interface BreadcrumbItem {
 export interface NavGroup {
     title: string;
     items: NavItem[];
-    roles?: string[];
+    roles?: roles['name'][];
 }
 
 export interface NavItem {
@@ -21,7 +21,7 @@ export interface NavItem {
     href: string;
     icon?: LucideIcon | null;
     isActive?: boolean;
-    roles?: string[];
+    roles?: roles['name'][];
 }
 
 export interface SharedData {
@@ -75,6 +75,7 @@ export interface Student {
     phone_number: string;
     parent_name: string;
     parent_occupation: string | null; // Bisa string atau null, karena nullable di database
+    kelas_id: number;
 
     // Timestamps dari Laravel
     created_at: string;
@@ -85,6 +86,22 @@ export interface DataHalaqah {
     id: number; // BIGINT → number
     nama_halaqah: string; // VARCHAR → string
     teacher_id: number | null; // BIGINT NULLABLE → number atau null
-
+    students?: Student[];
     teacher: Teacher; // Relasi ke tabel teachers
 }
+
+export type DataKelas = {
+    id: number;
+    nama_kelas: string;
+    waliKelas_id: number | null;
+    students?: Student[];
+    walikelas?: Teacher; // tambahin relasi guru
+};
+
+export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & {
+    auth: {
+        user: User;
+    };
+    // Anda bisa menambahkan properti global lainnya di sini
+    // contoh: flash messages, dll.
+};

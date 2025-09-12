@@ -30,4 +30,9 @@ class TeachersData extends Model
     {
         return $this->belongsToMany(Role::class, 'role_user');
     }
+
+    public function dataKelas()
+    {
+        return $this->hasOne(DataKelas::class, 'waliKelas_id');
+    }
 }

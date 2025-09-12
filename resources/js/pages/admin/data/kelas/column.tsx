@@ -7,30 +7,30 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { DataHalaqah } from '@/types';
+import { DataKelas } from '@/types';
 import { Link, router } from '@inertiajs/react';
 import { ColumnDef, RowData } from '@tanstack/react-table';
 import { Info, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
 
 declare module '@tanstack/react-table' {
     interface TableMeta<TData extends RowData> {
-        setDetailData?: (halaqah: TData) => void;
+        setDetailData?: (dataKelas: TData) => void;
     }
 }
 
-export const columns: ColumnDef<DataHalaqah>[] = [
+export const columns: ColumnDef<DataKelas>[] = [
     {
         id: 'no',
         header: 'NO',
         cell: ({ row }) => row.index + 1,
     },
     {
-        accessorKey: 'nama_halaqah',
-        header: 'Nama Halaqah',
+        accessorKey: 'nama_kelas',
+        header: 'Nama Kelas',
     },
     {
-        accessorFn: (row) => row.teacher?.user.name,
-        header: 'Pembimbing',
+        accessorFn: (row) => row.walikelas?.user.name,
+        header: 'Wali Kelas',
     },
 
     // Actions column
@@ -59,7 +59,7 @@ export const columns: ColumnDef<DataHalaqah>[] = [
 
                         {/* Edit */}
                         <DropdownMenuItem asChild>
-                            <Link href={route('datahalaqah.edit', row.original.id)} className="flex items-center gap-2">
+                            <Link href={route('datakelas.edit', row.original.id)} className="flex items-center gap-2">
                                 <Pencil className="h-4 w-4" />
                                 Edit
                             </Link>
@@ -69,7 +69,7 @@ export const columns: ColumnDef<DataHalaqah>[] = [
                         <DropdownMenuItem
                             onClick={() => {
                                 if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
-                                    router.delete(route('datahalaqah.destroy', row.original.id));
+                                    router.delete(route('datakelas.destroy', row.original.id));
                                 }
                             }}
                             className="flex cursor-pointer items-center gap-2 text-red-500"

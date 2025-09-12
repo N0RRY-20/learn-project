@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('nisn')->unique();
-            $table->string('class_level');
+
             $table->date('birth_date');
             $table->enum('gender', ['Laki-Laki', 'Perempuan']);
             $table->text('address');
