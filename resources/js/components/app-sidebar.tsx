@@ -50,9 +50,15 @@ const sidebarNavGroups: NavGroup[] = [
                 roles: ['Admin'],
             },
             {
-                title: 'target hafalan',
-                href: '/dashboard', // Pastikan `route` tersedia
+                title: 'Target Hafalan',
+                href: '/target-hafalan',
                 icon: Target,
+                roles: ['Guru Halaqah'],
+            },
+            {
+                title: 'Setoran Hafalan',
+                href: '/setoran-hafalan',
+                icon: LucideNotebookPen,
                 roles: ['Guru Halaqah'],
             },
 

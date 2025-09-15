@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
         $middleware->alias([
             'Admin' => \App\Http\Middleware\AdminMiddleware::class,
+            'GuruHalaqah' => \App\Http\Middleware\GuruHalaqahMiddleware::class,
         ]);
         $middleware->web(append: [
             HandleAppearance::class,

@@ -5,6 +5,8 @@ use App\Http\Controllers\admin\DataKelasController;
 use App\Http\Controllers\admin\StudentController;
 use App\Http\Controllers\admin\TeachersDataController;
 use App\Http\Controllers\admin\UserDataController;
+use App\Http\Controllers\SetoranHafalanController;
+use App\Http\Controllers\TargetHafalanController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -63,5 +65,19 @@ Route::middleware(['auth', 'Admin'])->group(function () {
     Route::delete('datakelasDestroy/{dataKelas}', [DataKelasController::class, 'destroy'])->name('datakelas.destroy');
 });
 
+Route::middleware(['auth', 'GuruHalaqah'])->group(function () {
+    // Setoran Hafalan (Hanya Guru)
+    Route::get('setoran-hafalan', [SetoranHafalanController::class, 'index'])->name('setoran-hafalan.index');
+    Route::post('setoran-hafalan', [SetoranHafalanController::class, 'store'])->name('setoran-hafalan.store');
+    Route::put('setoran-hafalan/{setoran}', [SetoranHafalanController::class, 'update'])->name('setoran-hafalan.update');
+    Route::delete('setoran-hafalan/{setoran}', [SetoranHafalanController::class, 'destroy'])->name('setoran-hafalan.destroy');
+
+    // Target Hafalan (Hanya Guru)
+    Route::get('target-hafalan', [TargetHafalanController::class, 'index'])->name('target-hafalan.index');
+    Route::get('target-hafalan/create', [TargetHafalanController::class, 'create'])->name('target-hafalan.create');
+    Route::post('target-hafalan', [TargetHafalanController::class, 'store'])->name('target-hafalan.store');
+    Route::put('target-hafalan/{target}', [TargetHafalanController::class, 'update'])->name('target-hafalan.update');
+    Route::delete('target-hafalan/{target}', [TargetHafalanController::class, 'destroy'])->name('target-hafalan.destroy');
+});
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

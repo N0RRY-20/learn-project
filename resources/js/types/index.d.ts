@@ -105,3 +105,39 @@ export type PageProps<T extends Record<string, unknown> = Record<string, unknown
     // Anda bisa menambahkan properti global lainnya di sini
     // contoh: flash messages, dll.
 };
+export interface Surah {
+    id: number;
+    nama_surah: string;
+    jumlah_ayat: number;
+}
+
+export interface Setoran {
+    id: number;
+    target_id: number;
+    santri_id: number;
+    status?: string; // opsional, sesuaikan jika perlu
+    created_at?: string;
+    updated_at?: string;
+}
+
+export interface Target {
+    id: number;
+    santri_id: number;
+    surah_start: number;
+    ayah_start: number;
+    surah_end: number;
+    ayah_end: number;
+    tanggal_target: string;
+    status: 'aktif' | 'selesai' | 'batal';
+    santri: Student;
+    setorans: Setoran[];
+
+    // computed dari backend (opsional)
+    status_target_dari_setoran?: 'tanpa_target' | 'belum_tercapai' | 'sampai_target' | 'melebihi_target' | 'belum_setor';
+    status_hafalan_dari_setoran?: 'belum_setor' | 'di_ulang' | 'lulus';
+    persentase_target_dari_setoran?: number;
+    bisa_dihilangkan?: boolean;
+
+    // tambahan saat flatten di frontend
+    tanggal_group?: string;
+}
