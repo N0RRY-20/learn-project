@@ -15,7 +15,7 @@ type TeacherProps = {
     teachersData: Teacher;
 };
 
-export default function edit({ teachersData }: TeacherProps) {
+export default function Edit({ teachersData }: TeacherProps) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Data Guru',

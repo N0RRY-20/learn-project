@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem, Target } from '@/types';
+import { BreadcrumbItem, Surah, Target } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { columns } from './column';
 
@@ -12,6 +12,7 @@ interface Props {
     targets: Record<string, Target[]>;
     targetHariIni: Target | null;
     tanggalHariIni: string;
+    surahs: Surah[];
 }
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -19,8 +20,10 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/dashboard',
     },
 ];
-export default function TargetHafalanIndex({ targets, targetHariIni }: Props) {
+export default function TargetHafalanIndex({ targets, targetHariIni, surahs }: Props) {
     const flatTargets = Object.entries(targets).flatMap(([tanggal, items]) => items.map((t) => ({ ...t, tanggal_group: tanggal })));
+
+    const surahMap = Object.fromEntries(surahs.map((s) => [s.id, s.nama_surah]));
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -75,8 +78,8 @@ export default function TargetHafalanIndex({ targets, targetHariIni }: Props) {
                                     <Label className="text-sm font-medium text-gray-600">Target Hafalan</Label>
                                     <p className="text-lg font-semibold">
                                         {targetHariIni.surah_start === targetHariIni.surah_end
-                                            ? `Surah ${targetHariIni.surah_start} Ayat ${targetHariIni.ayah_start}-${targetHariIni.ayah_end}`
-                                            : `Surah ${targetHariIni.surah_start}:${targetHariIni.ayah_start} - Surah ${targetHariIni.surah_end}:${targetHariIni.ayah_end}`}
+                                            ? `Surah ${surahMap[targetHariIni.surah_start] ?? targetHariIni.surah_start} Ayat ${targetHariIni.ayah_start}-${targetHariIni.ayah_end}`
+                                            : `Surah ${surahMap[targetHariIni.surah_start] ?? targetHariIni.surah_start}:${targetHariIni.ayah_start} - Surah ${surahMap[targetHariIni.surah_end] ?? targetHariIni.surah_end}:${targetHariIni.ayah_end}`}
                                     </p>
                                 </div>
                                 <div>
@@ -88,7 +91,8 @@ export default function TargetHafalanIndex({ targets, targetHariIni }: Props) {
                     </Card>
                 )}
 
-                <DataTable columns={columns} data={flatTargets} filterColumn="santri" />
+                <DataTable columns={columns} data={flatTargets} filterColumn="santri" meta={{ surahMap }} />
+                {/* Jadi, filterColumn="santri" artinya: input cari hanya pada kolom yang id-nya santri. Ini tidak ada hubungannya dengan nama tabel DB. */}
             </div>
         </AppLayout>
     );

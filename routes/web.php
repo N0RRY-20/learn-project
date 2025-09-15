@@ -61,7 +61,7 @@ Route::middleware(['auth', 'Admin'])->group(function () {
     Route::get('datakelasCreate', [DataKelasController::class, 'create'])->name('datakelas.create');
     Route::post('datakelasStore', [DataKelasController::class, 'store'])->name('datakelas.store');
     Route::get('datakelasEdit/{dataKelas}', [DataKelasController::class, 'edit'])->name('datakelas.edit');
-    Route::post('datakelasUpdate/{dataKelas}', [DataKelasController::class, 'update'])->name('datakelas.update');
+    Route::put('datakelasUpdate/{dataKelas}', [DataKelasController::class, 'update'])->name('datakelas.update');
     Route::delete('datakelasDestroy/{dataKelas}', [DataKelasController::class, 'destroy'])->name('datakelas.destroy');
 });
 
@@ -75,6 +75,7 @@ Route::middleware(['auth', 'GuruHalaqah'])->group(function () {
     // Target Hafalan (Hanya Guru)
     Route::get('target-hafalan', [TargetHafalanController::class, 'index'])->name('target-hafalan.index');
     Route::get('target-hafalan/create', [TargetHafalanController::class, 'create'])->name('target-hafalan.create');
+    Route::get('target-hafalan/{target}/edit', [TargetHafalanController::class, 'edit'])->name('target-hafalan.edit');
     Route::post('target-hafalan', [TargetHafalanController::class, 'store'])->name('target-hafalan.store');
     Route::put('target-hafalan/{target}', [TargetHafalanController::class, 'update'])->name('target-hafalan.update');
     Route::delete('target-hafalan/{target}', [TargetHafalanController::class, 'destroy'])->name('target-hafalan.destroy');

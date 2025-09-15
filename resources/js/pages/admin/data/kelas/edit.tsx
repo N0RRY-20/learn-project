@@ -27,7 +27,7 @@ type EditProps = PageProps & {
 };
 
 export default function Edit({ dataKelas, availableStudents, teachers }: EditProps) {
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, put, processing, errors } = useForm({
         nama_kelas: dataKelas.nama_kelas || '',
         waliKelas_id: dataKelas.waliKelas_id,
         students: dataKelas.students.length > 0 ? dataKelas.students.map((s) => ({ student_id: s.id.toString() })) : [{ student_id: '' }],
@@ -54,7 +54,7 @@ export default function Edit({ dataKelas, availableStudents, teachers }: EditPro
     // Fungsi untuk menangani submit form
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('datakelas.update', dataKelas.id)); // Sesuaikan dengan route Anda
+        put(route('datakelas.update', dataKelas.id)); // Sesuaikan dengan route Anda
     };
 
     // Filter siswa yang sudah dipilih agar tidak muncul lagi di dropdown lain

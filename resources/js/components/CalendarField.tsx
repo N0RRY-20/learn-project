@@ -8,9 +8,19 @@ import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as Celender } from 'lucide-react';
 
-export function CalendarField({ defaultDate }: { defaultDate?: string }) {
+type CalendarFieldProps = {
+    label?: string;
+    name?: string;
+    value?: string; // formatted yyyy-mm-dd
+    onChange?: (value: string) => void;
+    required?: boolean;
+    defaultDate?: string; // backward compat
+};
+
+export function CalendarField({ label, name, value, onChange, required, defaultDate }: CalendarFieldProps) {
     const [open, setOpen] = React.useState(false);
-    const [date, setDate] = React.useState<Date | undefined>(defaultDate ? new Date(defaultDate) : undefined);
+    const initial = value ?? defaultDate;
+    const [date, setDate] = React.useState<Date | undefined>(initial ? new Date(initial) : undefined);
 
     const format = (d?: Date) => {
         if (!d) return '';
@@ -18,14 +28,17 @@ export function CalendarField({ defaultDate }: { defaultDate?: string }) {
         return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
     };
 
+    const resolvedLabel = label ?? 'Tanggal Lahir';
+    const resolvedName = name ?? 'birth_date';
+
     return (
         <div className="flex flex-col gap-3">
-            <Label htmlFor="date" className="px-1">
-                Tanggal Lahir
+            <Label htmlFor={resolvedName} className="px-1">
+                {resolvedLabel}
             </Label>
             <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
-                    <Button variant="outline" id="date" className="w-48 justify-between font-normal">
+                    <Button variant="outline" id={resolvedName} className="w-48 justify-between font-normal">
                         {date ? date.toLocaleDateString() : 'Pilih Tanggal'}
                         <Celender />
                     </Button>
@@ -39,11 +52,13 @@ export function CalendarField({ defaultDate }: { defaultDate?: string }) {
                         onSelect={(d) => {
                             setDate(d);
                             setOpen(false);
+                            const formatted = format(d);
+                            if (onChange) onChange(formatted);
                         }}
                     />
                 </PopoverContent>
             </Popover>
-            <input type="hidden" name="birth_date" value={format(date)} required />
+            <input type="hidden" name={resolvedName} value={format(date)} required={required ?? true} />
         </div>
     );
 }

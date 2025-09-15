@@ -22,7 +22,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function create() {
+export default function Create() {
     const [roles, setRoles] = useState<string[]>([]);
 
     const [jenisKelamin, setJenisKelamin] = useState('');
@@ -104,7 +104,8 @@ export default function create() {
                                     <InputError message={errors.alamat ? 'Alamat wajib diisi' : ''} className="mt-2" />
                                 </div>
                                 <div className="grid gap-2">
-                                    <CalendarField />
+                                    <CalendarField label="Tanggal Lahir" name="birth_date" required />
+                                    <InputError message={errors.birth_date ? 'Tanggal lahir wajib diisi' : ''} className="mt-2" />
                                 </div>
 
                                 <div className="grid gap-2">

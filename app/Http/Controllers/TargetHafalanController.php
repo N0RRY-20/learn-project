@@ -209,15 +209,57 @@ class TargetHafalanController extends Controller
             abort(403, 'Target ini bukan untuk santri di halaqah Anda');
         }
 
+        // Izinkan update penuh seperti di store
         $request->validate([
-            'status' => 'required|in:aktif,selesai,batal',
+            'santri_id' => 'sometimes|exists:students,id',
+            'surah_start' => 'sometimes|integer|min:1|max:114',
+            'ayah_start' => 'sometimes|integer|min:1|max:286',
+            'surah_end' => 'sometimes|integer|min:1|max:114',
+            'ayah_end' => 'sometimes|integer|min:1|max:286',
+            'tanggal_target' => 'sometimes|date',
+            'status' => 'sometimes|in:aktif,selesai,batal',
         ]);
 
-        $target->update([
-            'status' => $request->status,
-        ]);
+        // Validasi opsional jika field dikirim
+        if ($request->filled('santri_id')) {
+            $santri = Student::where('id', $request->santri_id)
+                ->where('halaqah_id', $halaqah->id)
+                ->first();
+            if (! $santri) {
+                return back()->withErrors(['santri_id' => 'Santri tidak ada di halaqah Anda']);
+            }
+        }
 
-        return back()->with('success', 'Target berhasil diupdate');
+        if ($request->filled('surah_start')) {
+            $surahStart = Surah::find($request->surah_start);
+            if (! $surahStart) {
+                return back()->withErrors(['surah_start' => 'Surah mulai tidak valid']);
+            }
+            if ($request->filled('ayah_start') && $request->ayah_start > $surahStart->jumlah_ayat) {
+                return back()->withErrors(['ayah_start' => 'Ayat melebihi jumlah ayat surah '.$surahStart->nama_surah]);
+            }
+        }
+        if ($request->filled('surah_end')) {
+            $surahEnd = Surah::find($request->surah_end);
+            if (! $surahEnd) {
+                return back()->withErrors(['surah_end' => 'Surah selesai tidak valid']);
+            }
+            if ($request->filled('ayah_end') && $request->ayah_end > $surahEnd->jumlah_ayat) {
+                return back()->withErrors(['ayah_end' => 'Ayat melebihi jumlah ayat surah '.$surahEnd->nama_surah]);
+            }
+        }
+
+        $target->update($request->only([
+            'santri_id',
+            'surah_start',
+            'ayah_start',
+            'surah_end',
+            'ayah_end',
+            'tanggal_target',
+            'status',
+        ]));
+
+        return to_route('target-hafalan.index')->with('success', 'Target berhasil diupdate');
     }
 
     public function destroy(TargetHafalan $target)
@@ -240,5 +282,27 @@ class TargetHafalanController extends Controller
         $target->delete();
 
         return back()->with('success', 'Target berhasil dihapus');
+    }
+
+    public function edit(TargetHafalan $target)
+    {
+        $user = Auth::user();
+        if (! $user->roles->contains('name', 'Guru Halaqah')) {
+            abort(403, 'Hanya guru halaqah yang bisa akses');
+        }
+        $guru = TeachersData::where('user_id', $user->id)->first();
+        $halaqah = DataHalaqah::where('teacher_id', $guru->id)->first();
+
+        if ($target->santri->halaqah_id !== $halaqah->id) {
+            abort(403, 'Target ini bukan untuk santri di halaqah Anda');
+        }
+
+        $santri = Student::where('halaqah_id', $halaqah->id)->get();
+
+        return Inertia::render('tahfidz/targets/edit', [
+            'target' => $target,
+            'santri' => $santri,
+            'surahs' => Surah::orderBy('id')->get(),
+        ]);
     }
 }

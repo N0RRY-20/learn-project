@@ -58,17 +58,20 @@ export const columns: ColumnDef<Target>[] = [
     {
         accessorFn: (row) => row.santri?.name,
         id: 'santri',
-        header: 'Santri',
+        header: 'Santri/Santriwati',
         cell: ({ row }) => row.original.santri?.name ?? '-',
     },
     {
         id: 'target_hafalan',
         header: 'Target Hafalan',
-        cell: ({ row }) => {
+        cell: ({ row, table }) => {
             const t = row.original;
+            const surahMap: Record<number, string> | undefined = table.options.meta?.surahMap;
+            const startName = surahMap?.[t.surah_start] ?? t.surah_start;
+            const endName = surahMap?.[t.surah_end] ?? t.surah_end;
             return t.surah_start === t.surah_end
-                ? `Surah ${t.surah_start} Ayat ${t.ayah_start}-${t.ayah_end}`
-                : `Surah ${t.surah_start}:${t.ayah_start} - Surah ${t.surah_end}:${t.ayah_end}`;
+                ? `Surah ${startName} Ayat ${t.ayah_start}-${t.ayah_end}`
+                : `Surah ${startName}: ${t.ayah_start} - Surah ${endName}: ${t.ayah_end}`;
         },
     },
     {
@@ -160,7 +163,7 @@ export const columns: ColumnDef<Target>[] = [
 
                         {/* Edit */}
                         <DropdownMenuItem asChild>
-                            <Link href={route('students.edit', row.original.id)} className="flex items-center gap-2">
+                            <Link href={route('target-hafalan.edit', t.id)} className="flex items-center gap-2">
                                 <Pencil className="h-4 w-4" />
                                 Edit
                             </Link>

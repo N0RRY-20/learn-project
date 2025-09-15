@@ -13,7 +13,7 @@ import { useState } from 'react';
 type StudentProps = {
     student: Student;
 };
-export default function edit({ student }: StudentProps) {
+export default function Edit({ student }: StudentProps) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Data Santri/Santriwati',
