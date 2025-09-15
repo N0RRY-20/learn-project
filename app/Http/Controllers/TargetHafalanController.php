@@ -62,6 +62,7 @@ class TargetHafalanController extends Controller
             $target->status_hafalan_dari_setoran = $target->status_hafalan_dari_setoran;
             $target->persentase_target_dari_setoran = $target->persentase_target_dari_setoran;
             $target->bisa_dihilangkan = $target->bisa_dihilangkan;
+            $target->juz_target = $target->juz_target;
 
             return $target;
         });

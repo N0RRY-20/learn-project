@@ -77,7 +77,10 @@ export const columns: ColumnDef<Target>[] = [
     {
         id: 'juz',
         header: 'Juz',
-        cell: () => <span className="text-sm text-gray-600">Auto</span>,
+        cell: ({ row }) => {
+            const t = row.original;
+            return <span className="text-white-600 text-sm">{t.juz_target || 'Tidak diketahui'}</span>;
+        },
     },
     {
         accessorKey: 'status',

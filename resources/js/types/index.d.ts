@@ -129,6 +129,7 @@ export interface Target {
     ayah_end: number;
     tanggal_target: string;
     status: 'aktif' | 'selesai' | 'batal';
+    juz_target?: number;
     santri: Student;
     setorans: Setoran[];
 
