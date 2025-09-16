@@ -64,26 +64,44 @@ export default function TargetHafalanIndex({ targets, targetHariIni, surahs }: P
 
                 {/* Target Hari Ini */}
                 {targetHariIni && (
-                    <Card className="border-blue-200 bg-blue-50">
-                        <CardHeader>
-                            <CardTitle className="text-blue-800">Target Hari Ini</CardTitle>
+                    <Card className="relative overflow-hidden border-transparent">
+                        {/* Gradient Background */}
+                        <div
+                            className="absolute inset-0 z-0"
+                            style={{
+                                background: `
+                                    radial-gradient(ellipse 120% 80% at 70% 20%, rgba(255, 20, 147, 0.15), transparent 50%),
+                                    radial-gradient(ellipse 100% 60% at 30% 10%, rgba(0, 255, 255, 0.12), transparent 60%),
+                                    radial-gradient(ellipse 90% 70% at 50% 0%, rgba(138, 43, 226, 0.18), transparent 65%),
+                                    radial-gradient(ellipse 110% 50% at 80% 30%, rgba(255, 215, 0, 0.08), transparent 40%),
+                                    #000000
+                                `,
+                            }}
+                        />
+                        <CardHeader className="relative z-10">
+                            <CardTitle className="text-white">Target Hari Ini</CardTitle>
                         </CardHeader>
-                        <CardContent>
-                            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                                <div>
-                                    <Label className="text-sm font-medium text-gray-600">Santri</Label>
-                                    <p className="text-lg font-semibold">{targetHariIni.santri.name}</p>
+                        <CardContent className="relative z-10">
+                            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                                {/* Kolom 1: Santri */}
+                                <div className="flex flex-col gap-1">
+                                    <Label className="text-xs font-medium text-gray-400">Santri</Label>
+                                    <p className="text-lg font-semibold text-white">{targetHariIni.santri.name}</p>
                                 </div>
-                                <div>
-                                    <Label className="text-sm font-medium text-gray-600">Target Hafalan</Label>
-                                    <p className="text-lg font-semibold">
+
+                                {/* Kolom 2: Target Hafalan */}
+                                <div className="flex flex-col gap-1">
+                                    <Label className="text-xs font-medium text-gray-400">Target Hafalan</Label>
+                                    <p className="text-lg leading-snug font-semibold text-white">
                                         {targetHariIni.surah_start === targetHariIni.surah_end
                                             ? `Surah ${surahMap[targetHariIni.surah_start] ?? targetHariIni.surah_start} Ayat ${targetHariIni.ayah_start}-${targetHariIni.ayah_end}`
                                             : `Surah ${surahMap[targetHariIni.surah_start] ?? targetHariIni.surah_start}:${targetHariIni.ayah_start} - Surah ${surahMap[targetHariIni.surah_end] ?? targetHariIni.surah_end}:${targetHariIni.ayah_end}`}
                                     </p>
                                 </div>
-                                <div>
-                                    <Label className="text-sm font-medium text-gray-600">Status</Label>
+
+                                {/* Kolom 3: Status */}
+                                <div className="flex flex-col gap-1">
+                                    <Label className="text-xs font-medium text-gray-400">Status</Label>
                                     <Badge className={getStatusColor(targetHariIni.status)}>{getStatusText(targetHariIni.status)}</Badge>
                                 </div>
                             </div>
