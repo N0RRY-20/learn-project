@@ -2,7 +2,6 @@ import { DataTable } from '@/components/DataTable';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, Surah, Target } from '@/types';
 import { Head, Link } from '@inertiajs/react';
@@ -10,7 +9,7 @@ import { columns } from './column';
 
 interface Props {
     targets: Record<string, Target[]>;
-    targetHariIni: Target | null;
+    targetHariIni: Target[]; // Ubah dari Target | null menjadi Target[]
     tanggalHariIni: string;
     surahs: Surah[];
 }
@@ -63,7 +62,7 @@ export default function TargetHafalanIndex({ targets, targetHariIni, surahs }: P
                 </div>
 
                 {/* Target Hari Ini */}
-                {targetHariIni && (
+                {targetHariIni && targetHariIni.length > 0 && (
                     <Card className="relative overflow-hidden border-transparent">
                         {/* Gradient Background */}
                         <div
@@ -80,30 +79,36 @@ export default function TargetHafalanIndex({ targets, targetHariIni, surahs }: P
                         />
                         <CardHeader className="relative z-10">
                             <CardTitle className="text-white">Target Hari Ini</CardTitle>
+                            <div className="mt-2 grid grid-cols-1 gap-2 md:grid-cols-3">
+                                <p className="text-sm font-medium text-gray-300">Santri</p>
+                                <p className="text-sm font-medium text-gray-300">Target Hafalan</p>
+                                <p className="text-sm font-medium text-gray-300">Status</p>
+                            </div>
                         </CardHeader>
                         <CardContent className="relative z-10">
-                            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-                                {/* Kolom 1: Santri */}
-                                <div className="flex flex-col gap-1">
-                                    <Label className="text-xs font-medium text-gray-400">Santri</Label>
-                                    <p className="text-lg font-semibold text-white">{targetHariIni.santri.name}</p>
-                                </div>
+                            <div className="grid grid-cols-1 gap-6">
+                                {targetHariIni.map((target, index) => (
+                                    <div key={index} className="grid grid-cols-1 gap-2 md:grid-cols-3">
+                                        {/* Kolom 1: Santri */}
+                                        <div className="flex flex-col">
+                                            <p className="text-sm text-white">{target.santri.name}</p>
+                                        </div>
 
-                                {/* Kolom 2: Target Hafalan */}
-                                <div className="flex flex-col gap-1">
-                                    <Label className="text-xs font-medium text-gray-400">Target Hafalan</Label>
-                                    <p className="text-lg leading-snug font-semibold text-white">
-                                        {targetHariIni.surah_start === targetHariIni.surah_end
-                                            ? `Surah ${surahMap[targetHariIni.surah_start] ?? targetHariIni.surah_start} Ayat ${targetHariIni.ayah_start}-${targetHariIni.ayah_end}`
-                                            : `Surah ${surahMap[targetHariIni.surah_start] ?? targetHariIni.surah_start}:${targetHariIni.ayah_start} - Surah ${surahMap[targetHariIni.surah_end] ?? targetHariIni.surah_end}:${targetHariIni.ayah_end}`}
-                                    </p>
-                                </div>
+                                        {/* Kolom 2: Target Hafalan */}
+                                        <div className="flex flex-col">
+                                            <p className="text-sm text-white">
+                                                {target.surah_start === target.surah_end
+                                                    ? `Surah ${surahMap[target.surah_start] ?? target.surah_start} Ayat ${target.ayah_start}-${target.ayah_end}`
+                                                    : `Surah ${surahMap[target.surah_start] ?? target.surah_start}:${target.ayah_start} - Surah ${surahMap[target.surah_end] ?? target.surah_end}:${target.ayah_end}`}
+                                            </p>
+                                        </div>
 
-                                {/* Kolom 3: Status */}
-                                <div className="flex flex-col gap-1">
-                                    <Label className="text-xs font-medium text-gray-400">Status</Label>
-                                    <Badge className={getStatusColor(targetHariIni.status)}>{getStatusText(targetHariIni.status)}</Badge>
-                                </div>
+                                        {/* Kolom 3: Status */}
+                                        <div className="flex flex-col">
+                                            <Badge className={getStatusColor(target.status)}>{getStatusText(target.status)}</Badge>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </CardContent>
                     </Card>

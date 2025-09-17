@@ -55,7 +55,7 @@ class SetoranHafalanController extends Controller
 
         // Filter target yang belum bisa dihilangkan (sama seperti di TargetHafalanController)
         $targets = $allTargets->filter(function ($target) {
-            return !$target->bisa_dihilangkan;
+            return ! $target->bisa_dihilangkan;
         });
 
         // Ambil setoran dari santri di halaqah ini
@@ -72,11 +72,62 @@ class SetoranHafalanController extends Controller
             $setoran->status_target_indonesia = $setoran->status_target_indonesia;
             $setoran->status_target_color = $setoran->status_target_color;
             $setoran->persentase_target = $setoran->persentase_target;
+
             return $setoran;
         });
 
         return Inertia::render('tahfidz/setoran/index', [
             'setorans' => $setoransWithStatus,
+            'santri' => $santri,
+            'surahs' => Surah::orderBy('id')->get(),
+            'targets' => $targets->values()->toArray(), // Konversi Collection ke array
+        ]);
+    }
+
+    public function create()
+    {
+        $user = Auth::user();
+
+        // Hanya guru halaqah yang bisa akses
+        if (! $user->roles()->where('name', 'Guru Halaqah')->exists()) {
+            abort(403, 'Hanya guru halaqah yang bisa akses');
+        }
+
+        $guru = TeachersData::where('user_id', $user->id)->first();
+
+        if (! $guru) {
+            abort(403, 'Anda bukan guru halaqah');
+        }
+
+        // Ambil halaqah guru ini
+        $halaqah = DataHalaqah::where('teacher_id', $guru->id)->first();
+
+        if (! $halaqah) {
+            return Inertia::render('tahfidz/setoran/create', [
+                'santri' => [],
+                'surahs' => [],
+                'targets' => [],
+                'message' => 'Anda belum memiliki halaqah',
+            ]);
+        }
+
+        // Ambil santri di halaqah ini
+        $santri = Student::where('halaqah_id', $halaqah->id)->get();
+
+        // Ambil target aktif untuk dropdown (dengan filter auto-hide)
+        $allTargets = TargetHafalan::with(['santri'])
+            ->whereHas('santri', function ($query) use ($halaqah) {
+                $query->where('halaqah_id', $halaqah->id);
+            })
+            ->where('status', 'aktif')
+            ->get();
+
+        // Filter target yang belum bisa dihilangkan
+        $targets = $allTargets->filter(function ($target) {
+            return ! $target->bisa_dihilangkan;
+        });
+
+        return Inertia::render('tahfidz/setoran/create', [
             'santri' => $santri,
             'surahs' => Surah::orderBy('id')->get(),
             'targets' => $targets->values()->toArray(), // Konversi Collection ke array
@@ -125,11 +176,11 @@ class SetoranHafalanController extends Controller
         }
 
         if ($request->ayah_start > $surahStart->jumlah_ayat) {
-            return back()->withErrors(['ayah_start' => 'Ayat melebihi jumlah ayat surah ' . $surahStart->nama_surah]);
+            return back()->withErrors(['ayah_start' => 'Ayat melebihi jumlah ayat surah '.$surahStart->nama_surah]);
         }
 
         if ($request->ayah_end > $surahEnd->jumlah_ayat) {
-            return back()->withErrors(['ayah_end' => 'Ayat melebihi jumlah ayat surah ' . $surahEnd->nama_surah]);
+            return back()->withErrors(['ayah_end' => 'Ayat melebihi jumlah ayat surah '.$surahEnd->nama_surah]);
         }
 
         // Convert 'null' string to actual null
@@ -149,7 +200,7 @@ class SetoranHafalanController extends Controller
             'tanggal_review' => now(), // Langsung direview karena guru yang input
         ]);
 
-        return back()->with('success', 'Setoran hafalan berhasil disimpan');
+        return to_route('setoran-hafalan.index')->with('success', 'Setoran hafalan berhasil disimpan');
     }
 
     public function update(Request $request, SetoranHafalan $setoran)

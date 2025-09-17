@@ -68,6 +68,7 @@ Route::middleware(['auth', 'Admin'])->group(function () {
 Route::middleware(['auth', 'GuruHalaqah'])->group(function () {
     // Setoran Hafalan (Hanya Guru)
     Route::get('setoran-hafalan', [SetoranHafalanController::class, 'index'])->name('setoran-hafalan.index');
+    Route::get('setoran-hafalan/create', [SetoranHafalanController::class, 'create'])->name('setoran-hafalan.create');
     Route::post('setoran-hafalan', [SetoranHafalanController::class, 'store'])->name('setoran-hafalan.store');
     Route::put('setoran-hafalan/{setoran}', [SetoranHafalanController::class, 'update'])->name('setoran-hafalan.update');
     Route::delete('setoran-hafalan/{setoran}', [SetoranHafalanController::class, 'destroy'])->name('setoran-hafalan.destroy');
