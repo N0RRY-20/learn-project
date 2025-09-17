@@ -72,8 +72,16 @@ class TargetHafalanController extends Controller
             return $target->tanggal_target->format('Y-m-d');
         });
 
-        // Ambil target hari ini (semua, bukan hanya yang pertama)
+        // Ambil target hari ini
         $targetHariIni = $targetsWithStatus->where('tanggal_target', today())->values();
+
+        // dd('tahfidz/targets/index', [
+        //     'targets' => $targetsGrouped,
+        //     'santri' => $santri,
+        //     'surahs' => Surah::orderBy('id')->get(),
+        //     'targetHariIni' => $targetHariIni,
+        //     'tanggalHariIni' => today()->format('Y-m-d'),
+        // ]);
 
         return Inertia::render('tahfidz/targets/index', [
             'targets' => $targetsGrouped,

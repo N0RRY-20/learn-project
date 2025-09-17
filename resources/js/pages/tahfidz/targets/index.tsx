@@ -69,48 +69,77 @@ export default function TargetHafalanIndex({ targets, targetHariIni, surahs }: P
                             className="absolute inset-0 z-0"
                             style={{
                                 background: `
-                                    radial-gradient(ellipse 120% 80% at 70% 20%, rgba(255, 20, 147, 0.15), transparent 50%),
-                                    radial-gradient(ellipse 100% 60% at 30% 10%, rgba(0, 255, 255, 0.12), transparent 60%),
-                                    radial-gradient(ellipse 90% 70% at 50% 0%, rgba(138, 43, 226, 0.18), transparent 65%),
-                                    radial-gradient(ellipse 110% 50% at 80% 30%, rgba(255, 215, 0, 0.08), transparent 40%),
-                                    #000000
-                                `,
+                radial-gradient(ellipse 120% 80% at 70% 20%, rgba(255, 20, 147, 0.15), transparent 50%),
+                radial-gradient(ellipse 100% 60% at 30% 10%, rgba(0, 255, 255, 0.12), transparent 60%),
+                radial-gradient(ellipse 90% 70% at 50% 0%, rgba(138, 43, 226, 0.18), transparent 65%),
+                radial-gradient(ellipse 110% 50% at 80% 30%, rgba(255, 215, 0, 0.08), transparent 40%)`,
                             }}
                         />
-                        <CardHeader className="relative z-10">
-                            <CardTitle className="text-white">Target Hari Ini</CardTitle>
-                            <div className="mt-2 grid grid-cols-1 gap-2 md:grid-cols-3">
-                                <p className="text-sm font-medium text-gray-300">Santri</p>
-                                <p className="text-sm font-medium text-gray-300">Target Hafalan</p>
-                                <p className="text-sm font-medium text-gray-300">Status</p>
-                            </div>
-                        </CardHeader>
-                        <CardContent className="relative z-10">
-                            <div className="grid grid-cols-1 gap-6">
-                                {targetHariIni.map((target, index) => (
-                                    <div key={index} className="grid grid-cols-1 gap-2 md:grid-cols-3">
-                                        {/* Kolom 1: Santri */}
-                                        <div className="flex flex-col">
-                                            <p className="text-sm text-white">{target.santri.name}</p>
-                                        </div>
+                        {/* Base background ikut theme */}
+                        <div className="absolute inset-0 z-[-1] bg-background" />
 
-                                        {/* Kolom 2: Target Hafalan */}
-                                        <div className="flex flex-col">
-                                            <p className="text-sm text-white">
-                                                {target.surah_start === target.surah_end
-                                                    ? `Surah ${surahMap[target.surah_start] ?? target.surah_start} Ayat ${target.ayah_start}-${target.ayah_end}`
-                                                    : `Surah ${surahMap[target.surah_start] ?? target.surah_start}:${target.ayah_start} - Surah ${surahMap[target.surah_end] ?? target.surah_end}:${target.ayah_end}`}
-                                            </p>
-                                        </div>
+                        {/* Desktop Layout */}
+                        <div className="hidden md:block">
+                            <CardHeader className="relative z-10">
+                                <CardTitle className="text-foreground">Target Hari Ini</CardTitle>
+                                <div className="mt-2 grid grid-cols-3 gap-2">
+                                    <p className="text-sm font-medium text-muted-foreground">Santri</p>
+                                    <p className="text-sm font-medium text-muted-foreground">Target Hafalan</p>
+                                    <p className="text-sm font-medium text-muted-foreground">Status</p>
+                                </div>
+                            </CardHeader>
 
-                                        {/* Kolom 3: Status */}
-                                        <div className="flex flex-col">
-                                            <Badge className={getStatusColor(target.status)}>{getStatusText(target.status)}</Badge>
+                            <CardContent className="relative z-10">
+                                <div className="grid grid-cols-1 gap-6">
+                                    {targetHariIni.map((target, index) => (
+                                        <div key={index} className="grid grid-cols-3 gap-2">
+                                            <div className="flex flex-col">
+                                                <p className="text-sm text-foreground">{target.santri.name}</p>
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <p className="text-sm text-foreground">
+                                                    {target.surah_start === target.surah_end
+                                                        ? `Surah ${surahMap[target.surah_start] ?? target.surah_start} Ayat ${target.ayah_start}-${target.ayah_end}`
+                                                        : `Surah ${surahMap[target.surah_start] ?? target.surah_start}:${target.ayah_start} - Surah ${surahMap[target.surah_end] ?? target.surah_end}:${target.ayah_end}`}
+                                                </p>
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <Badge className={getStatusColor(target.status)}>{getStatusText(target.status)}</Badge>
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    ))}
+                                </div>
+                            </CardContent>
+                        </div>
+
+                        {/* Mobile Layout - Opsi 1: Title sebagai label inline dengan card kecil */}
+                        <div className="md:hidden">
+                            <div className="relative z-10 p-4">
+                                <h3 className="mb-4 text-lg font-semibold text-foreground">Target Hari Ini</h3>
+                                <div className="space-y-3">
+                                    {targetHariIni.map((target, index) => (
+                                        <div key={index} className="space-y-2 rounded-lg border bg-card/50 p-3">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-xs font-medium text-muted-foreground">Santri:</span>
+                                                <span className="text-sm font-medium text-foreground">{target.santri.name}</span>
+                                            </div>
+                                            <div className="flex items-start justify-between">
+                                                <span className="text-xs font-medium text-muted-foreground">Target:</span>
+                                                <span className="max-w-[60%] text-right text-sm text-foreground">
+                                                    {target.surah_start === target.surah_end
+                                                        ? `Surah ${surahMap[target.surah_start] ?? target.surah_start} Ayat ${target.ayah_start}-${target.ayah_end}`
+                                                        : `Surah ${surahMap[target.surah_start] ?? target.surah_start}:${target.ayah_start} - Surah ${surahMap[target.surah_end] ?? target.surah_end}:${target.ayah_end}`}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-xs font-medium text-muted-foreground">Status:</span>
+                                                <Badge className={getStatusColor(target.status)}>{getStatusText(target.status)}</Badge>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                        </CardContent>
+                        </div>
                     </Card>
                 )}
 
