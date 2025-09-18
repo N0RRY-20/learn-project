@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem, MurojaahFormData, MurojaahStatus, Student, Surah } from '@/types';
+import { BreadcrumbItem, Murojaah, MurojaahFormData, MurojaahStatus, Student, Surah } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -12,46 +12,36 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Murojaah Hafalan', href: '/murojaah' },
 ];
 
-interface MurojaahCreateProps {
+interface EditProps {
+    murojaah: Murojaah;
     santri: Student[];
     surahs: Surah[];
-    message?: string;
 }
 
-export default function Create({ santri, surahs, message }: MurojaahCreateProps) {
-    const { data, setData, post, processing, errors, reset } = useForm<MurojaahFormData>({
-        student_id: '',
-        surah_start: '',
-        ayah_start: '',
-        surah_end: '',
-        ayah_end: '', // Set default ke hari ini
-        status: 'Perlu Diulang',
-        nilai: '',
-        catatan: '',
+export default function Edit({ murojaah, santri, surahs }: EditProps) {
+    const { data, setData, put, processing, errors } = useForm<MurojaahFormData>({
+        student_id: murojaah.student_id.toString(),
+        surah_start: murojaah.surah_start.toString(),
+        ayah_start: murojaah.ayah_start.toString(),
+        surah_end: murojaah.surah_end.toString(),
+        ayah_end: murojaah.ayah_end.toString(),
+        status: murojaah.status,
+        nilai: murojaah.nilai?.toString() ?? '',
+        catatan: murojaah.catatan ?? '',
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('murojaah.store'), { onSuccess: () => reset() });
+        put(route('murojaah.update', murojaah.id));
     };
-
-    // Kalau tidak ada halaqah
-    if (message) {
-        return (
-            <AppLayout breadcrumbs={breadcrumbs}>
-                <Head title="Tambah Murojaah Hafalan" />
-                <div className="p-6 text-center text-red-500">{message}</div>
-            </AppLayout>
-        );
-    }
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Tambah Murojaah Hafalan" />
+            <Head title="Edit Murojaah Hafalan" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <Card>
                     <CardHeader>
-                        <CardTitle>Input Murojaah Santri/SantriWati</CardTitle>
+                        <CardTitle>Edit Murojaah Santri</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-4">
@@ -89,19 +79,15 @@ export default function Create({ santri, surahs, message }: MurojaahCreateProps)
                                             ))}
                                         </SelectContent>
                                     </Select>
-                                    {errors.surah_start && <p className="text-sm text-red-500">{errors.surah_start}</p>}
                                 </div>
                                 <div>
-                                    <Label htmlFor="ayat_awal">Ayat Mulai</Label>
+                                    <Label htmlFor="ayah_start">Ayat Mulai</Label>
                                     <Input
-                                        id="ayat_awal"
+                                        id="ayah_start"
                                         type="number"
                                         value={data.ayah_start}
                                         onChange={(e) => setData('ayah_start', e.target.value)}
-                                        min="1"
-                                        required
                                     />
-                                    {errors.ayah_start && <p className="text-sm text-red-500">{errors.ayah_start}</p>}
                                 </div>
                             </div>
 
@@ -121,23 +107,12 @@ export default function Create({ santri, surahs, message }: MurojaahCreateProps)
                                             ))}
                                         </SelectContent>
                                     </Select>
-                                    {errors.surah_end && <p className="text-sm text-red-500">{errors.surah_end}</p>}
                                 </div>
                                 <div>
-                                    <Label htmlFor="ayat_akhir">Ayat Selesai</Label>
-                                    <Input
-                                        id="ayat_akhir"
-                                        type="number"
-                                        value={data.ayah_end}
-                                        onChange={(e) => setData('ayah_end', e.target.value)}
-                                        min="1"
-                                        required
-                                    />
-                                    {errors.ayah_end && <p className="text-sm text-red-500">{errors.ayah_end}</p>}
+                                    <Label htmlFor="ayah_end">Ayat Selesai</Label>
+                                    <Input id="ayah_end" type="number" value={data.ayah_end} onChange={(e) => setData('ayah_end', e.target.value)} />
                                 </div>
                             </div>
-
-                            {/* Tanggal Murojaah */}
 
                             {/* Status & Nilai */}
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -152,7 +127,6 @@ export default function Create({ santri, surahs, message }: MurojaahCreateProps)
                                             <SelectItem value="Lulus">Lulus</SelectItem>
                                         </SelectContent>
                                     </Select>
-                                    {errors.status && <p className="text-sm text-red-500">{errors.status}</p>}
                                 </div>
                                 <div>
                                     <Label htmlFor="nilai">Nilai</Label>
@@ -161,10 +135,9 @@ export default function Create({ santri, surahs, message }: MurojaahCreateProps)
                                         type="number"
                                         value={data.nilai}
                                         onChange={(e) => setData('nilai', e.target.value)}
-                                        min="0"
-                                        max="100"
+                                        min={0}
+                                        max={100}
                                     />
-                                    {errors.nilai && <p className="text-sm text-red-500">{errors.nilai}</p>}
                                 </div>
                             </div>
 
@@ -177,11 +150,10 @@ export default function Create({ santri, surahs, message }: MurojaahCreateProps)
                                     onChange={(e) => setData('catatan', e.target.value)}
                                     placeholder="Masukkan catatan"
                                 />
-                                {errors.catatan && <p className="text-sm text-red-500">{errors.catatan}</p>}
                             </div>
 
                             <Button type="submit" disabled={processing}>
-                                {processing ? 'Menyimpan...' : 'Simpan'}
+                                {processing ? 'Menyimpan...' : 'Simpan Perubahan'}
                             </Button>
                         </form>
                     </CardContent>

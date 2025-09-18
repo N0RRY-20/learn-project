@@ -2,9 +2,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Murojaah } from '@/types';
-import { router } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
-import { MoreHorizontal, Trash2 } from 'lucide-react';
+import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
 
 const getStatusColor = (status: Murojaah['status']) => {
     switch (status) {
@@ -101,9 +101,9 @@ export const columns: ColumnDef<Murojaah>[] = [
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
                         <DropdownMenuItem asChild>
-                            {/* <Link href={route('murojaah.edit', m.id)} className="flex items-center gap-2">
+                            <Link href={route('murojaah.edit', m.id)} className="flex items-center gap-2">
                                 <Pencil className="h-4 w-4" /> Edit
-                            </Link> */}
+                            </Link>
                         </DropdownMenuItem>
 
                         <DropdownMenuItem

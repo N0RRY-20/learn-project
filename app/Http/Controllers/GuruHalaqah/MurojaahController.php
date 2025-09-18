@@ -92,9 +92,9 @@ class MurojaahController extends Controller
         $request->validate([
             'student_id' => 'required|exists:students,id',
             'surah_start' => 'required|integer|min:1|max:114',
-            'ayah_start' => 'required|integer|min:1|max:286',
+            'ayah_start' => 'required|integer|min:1',
             'surah_end' => 'required|integer|min:1|max:114',
-            'ayah_end' => 'required|integer|min:1|max:286',
+            'ayah_end' => 'required|integer|min:1',
             'status' => 'required|in:Lulus,Perlu Diulang',
             'nilai' => 'nullable|integer|min:0|max:100',
             'catatan' => 'nullable|string',
@@ -109,6 +109,13 @@ class MurojaahController extends Controller
         }
         $surahStart = Surah::find($request->surah_start);
         $surahEnd = Surah::find($request->surah_end);
+
+        if ($request->surah_start > $request->surah_end) {
+            return back()->withErrors([
+                'surah_start' => 'Perhatikan Urutan Surah',
+                'surah_end' => 'Perhatikan Urutan Surah',
+            ])->withInput();
+        }
 
         if (! $surahStart || ! $surahEnd) {
             return back()->withErrors(['surah' => 'Surah tidak valid']);
@@ -136,5 +143,82 @@ class MurojaahController extends Controller
         ]);
 
         return redirect()->route('murojaah.index')->with('success', 'Murojaah berhasil ditambahkan');
+    }
+
+    public function edit(Murojaah $murojaah)
+    {
+        $user = Auth::user();
+
+        if (! $user->roles->contains('name', 'Guru Halaqah')) {
+            abort(403, 'Hanya guru halaqah yang bisa akses');
+        }
+
+        $guru = TeachersData::where('user_id', $user->id)->first();
+        if (! $guru) {
+            abort(403, 'Anda bukan guru halaqah');
+        }
+        $halaqah = DataHalaqah::where('teacher_id', $guru->id)->first();
+
+        if (! $halaqah) {
+            return Inertia::render('tahfidz/setoran/create', [
+                'santri' => [],
+                'surahs' => [],
+                'targets' => [],
+                'message' => 'Anda belum memiliki halaqah',
+            ]);
+        }
+        $santri = Student::where('halaqah_id', $halaqah->id)->get();
+
+        return Inertia::render('tahfidz/murojaah/edit', [
+            'murojaah' => $murojaah,
+            'santri' => $santri,
+            'surahs' => Surah::all(['id', 'nama_surah']),
+        ]);
+    }
+
+    public function update(Request $request, Murojaah $murojaah)
+    {
+        $user = Auth::user();
+
+        if (! $user->roles->contains('name', 'Guru Halaqah')) {
+            abort(403, 'Hanya guru halaqah yang bisa akses');
+        }
+
+        $guru = TeachersData::where('user_id', $user->id)->first();
+        if (! $guru) {
+            abort(403, 'Anda bukan guru halaqah');
+        }
+        $halaqah = DataHalaqah::where('teacher_id', $guru->id)->first();
+
+        if (! $halaqah) {
+            return Inertia::render('tahfidz/setoran/create', [
+                'santri' => [],
+                'surahs' => [],
+                'targets' => [],
+                'message' => 'Anda belum memiliki halaqah',
+            ]);
+        }
+
+        $request->validate([
+            'student_id' => 'required|exists:students,id',
+            'surah_start' => 'required|integer|min:1|max:114',
+            'ayah_start' => 'required|integer|min:1|max:286',
+            'surah_end' => 'required|integer|min:1|max:114',
+            'ayah_end' => 'required|integer|min:1|max:286',
+            'status' => 'required|in:Lulus,Perlu Diulang',
+            'nilai' => 'nullable|integer|min:0|max:100',
+            'catatan' => 'nullable|string',
+        ]);
+
+        $murojaah->update($request->all());
+
+        return redirect()->route('murojaah.index')->with('success', 'Murojaah berhasil diupdate');
+    }
+
+    public function destroy(Murojaah $murojaah)
+    {
+        $murojaah->delete();
+
+        return redirect()->route('murojaah.index')->with('success', 'Murojaah berhasil dihapus');
     }
 }
