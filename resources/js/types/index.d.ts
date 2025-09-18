@@ -113,13 +113,67 @@ export interface Surah {
 
 export interface Setoran {
     id: number;
-    target_id: number;
     santri_id: number;
-    status?: string; // opsional, sesuaikan jika perlu
+    target_id?: number | null;
+    surah_start: number;
+    ayah_start: number;
+    surah_end: number;
+    ayah_end: number;
+    status: 'belum_setor' | 'di_ulang' | 'lulus';
+    feedback_guru?: string | null;
+    nilai?: number | null;
+    tanggal_setor: string;
     created_at?: string;
     updated_at?: string;
+
+    // Relasi
+    santri: Student;
+    target?: Target | null;
+
+    // Computed properties dari backend
+    status_target?: 'tanpa_target' | 'belum_tercapai' | 'sampai_target' | 'melebihi_target';
+    status_target_indonesia?: string;
+    status_target_color?: string;
+    persentase_target?: number;
 }
 
+// Form data types untuk useForm
+export interface SetoranFormData {
+    santri_id: string;
+    target_id: string; // string karena form menggunakan 'null' sebagai string
+    surah_start: string;
+    ayah_start: string;
+    surah_end: string;
+    ayah_end: string;
+    status: 'belum_setor' | 'di_ulang' | 'lulus';
+    feedback_guru: string;
+    nilai: string;
+
+    tanggal_setor?: string; // optional, biasanya otomatis di backend
+    tanggal_review?: string; // optional
+}
+
+export interface SetoranPageProps {
+    setorans: Setoran[];
+    surahs: Surah[];
+}
+
+export interface SetoranCreateProps {
+    santri: Student[];
+    surahs: Surah[];
+    targets: Target[];
+}
+
+export interface SetoranEditProps {
+    setoran: Setoran;
+    santri: Student[];
+    surahs: Surah[];
+    targets: Target[];
+}
+
+// Status types untuk type safety
+export type SetoranStatus = 'belum_setor' | 'di_ulang' | 'lulus';
+export type StatusTarget = 'tanpa_target' | 'belum_tercapai' | 'sampai_target' | 'melebihi_target';
 export interface Target {
     id: number;
     santri_id: number;

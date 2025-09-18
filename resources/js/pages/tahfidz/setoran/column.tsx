@@ -1,11 +1,12 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { router } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
-import { MoreHorizontal, Trash2 } from 'lucide-react';
+import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
+import { Setoran, SetoranStatus, StatusTarget } from '@/types';
 
-const getStatusColor = (status: string) => {
+const getStatusColor = (status: SetoranStatus): string => {
     switch (status) {
         case 'belum_setor':
             return 'bg-gray-100 text-gray-800';
@@ -18,7 +19,7 @@ const getStatusColor = (status: string) => {
     }
 };
 
-const getStatusText = (status: string) => {
+const getStatusText = (status: SetoranStatus): string => {
     switch (status) {
         case 'belum_setor':
             return 'Belum Setor';
@@ -31,7 +32,7 @@ const getStatusText = (status: string) => {
     }
 };
 
-const getStatusTargetColor = (status: string) => {
+const getStatusTargetColor = (status: StatusTarget): string => {
     switch (status) {
         case 'tanpa_target':
             return 'bg-gray-100 text-gray-800';
@@ -46,9 +47,10 @@ const getStatusTargetColor = (status: string) => {
     }
 };
 
-const formatTanggalHari = (tanggal?: string) => {
+const formatTanggalHari = (tanggal?: string): string => {
     if (!tanggal) return '-';
-    const d = new Date(tanggal + 'T00:00:00'); // aman timezone
+    const d = new Date(tanggal);
+    if (isNaN(d.getTime())) return '-';
     return d.toLocaleDateString('id-ID', {
         weekday: 'long',
         day: '2-digit',
@@ -56,36 +58,13 @@ const formatTanggalHari = (tanggal?: string) => {
         year: 'numeric',
     });
 };
-// Interface untuk Setoran yang digunakan di DataTable
-interface Setoran {
-    id: number;
-    santri_id: number;
-    target_id?: number;
-    surah_start: number;
-    ayah_start: number;
-    surah_end: number;
-    ayah_end: number;
-    status: 'belum_setor' | 'di_ulang' | 'lulus';
-    feedback_guru?: string;
-    nilai?: number;
-    tanggal_setor: string;
-    santri: {
-        id: number;
-        name: string;
-    };
-    target?: {
-        id: number;
-        surah_start: number;
-        ayah_start: number;
-        surah_end: number;
-        ayah_end: number;
-    };
-    status_target?: 'tanpa_target' | 'belum_tercapai' | 'sampai_target' | 'melebihi_target';
-    status_target_indonesia?: string;
-    persentase_target?: number;
-}
 
 export const columns: ColumnDef<Setoran>[] = [
+    {
+        id: 'no',
+        header: 'NO',
+        cell: ({ row }) => row.index + 1,
+    },
     {
         accessorFn: (row) => row.santri?.name,
         id: 'santri',
@@ -157,7 +136,7 @@ export const columns: ColumnDef<Setoran>[] = [
         id: 'tanggal_setor',
         header: 'Tanggal Setor',
         accessorKey: 'tanggal_setor',
-        cell: ({ row }) => new Date(row.original.tanggal_setor).toLocaleDateString('id-ID'),
+        cell: ({ row }) => formatTanggalHari(row.original.tanggal_setor),
     },
     {
         id: 'feedback',
@@ -183,10 +162,10 @@ export const columns: ColumnDef<Setoran>[] = [
 
                         {/* Edit */}
                         <DropdownMenuItem asChild>
-                            {/* <Link href={route('setoran-hafalan.edit', setoran.id)} className="flex items-center gap-2">
+                            <Link href={route('setoran-hafalan.edit', setoran.id)} className="flex items-center gap-2">
                                 <Pencil className="h-4 w-4" />
                                 Edit
-                            </Link> */}
+                            </Link>
                         </DropdownMenuItem>
 
                         {/* Delete */}

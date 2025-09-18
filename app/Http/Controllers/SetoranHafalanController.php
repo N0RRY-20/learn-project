@@ -19,7 +19,7 @@ class SetoranHafalanController extends Controller
         $user = Auth::user();
 
         // Hanya guru halaqah yang bisa akses
-        if (! $user->roles()->where('name', 'Guru Halaqah')->exists()) {
+        if (! $user->roles->contains('name', 'Guru Halaqah')) {
             abort(403, 'Hanya guru halaqah yang bisa akses');
         }
 
@@ -64,7 +64,12 @@ class SetoranHafalanController extends Controller
                 $query->where('halaqah_id', $halaqah->id);
             })
             ->orderBy('tanggal_setor', 'desc')
-            ->get();
+            ->get()
+            ->map(function ($setoran) {
+                $setoran->tanggal_setor = $setoran->tanggal_setor->format('Y-m-d');
+
+                return $setoran;
+            });
 
         // **TAMBAHKAN: Evaluasi status target untuk setiap setoran**
         $setoransWithStatus = $setorans->map(function ($setoran) {
@@ -89,7 +94,7 @@ class SetoranHafalanController extends Controller
         $user = Auth::user();
 
         // Hanya guru halaqah yang bisa akses
-        if (! $user->roles()->where('name', 'Guru Halaqah')->exists()) {
+        if (! $user->roles->contains('name', 'Guru Halaqah')) {
             abort(403, 'Hanya guru halaqah yang bisa akses');
         }
 
@@ -139,7 +144,7 @@ class SetoranHafalanController extends Controller
         $user = Auth::user();
 
         // Hanya guru halaqah yang bisa input setoran
-        if (! $user->roles()->where('name', 'Guru Halaqah')->exists()) {
+        if (! $user->roles->contains('name', 'Guru Halaqah')) {
             abort(403, 'Hanya guru halaqah yang bisa input setoran hafalan');
         }
 
@@ -203,12 +208,66 @@ class SetoranHafalanController extends Controller
         return to_route('setoran-hafalan.index')->with('success', 'Setoran hafalan berhasil disimpan');
     }
 
+    public function edit(SetoranHafalan $setoran)
+    {
+        $user = Auth::user();
+
+        // Hanya guru halaqah yang bisa akses
+        if (! $user->roles->contains('name', 'Guru Halaqah')) {
+            abort(403, 'Hanya guru halaqah yang bisa akses');
+        }
+
+        $guru = TeachersData::where('user_id', $user->id)->first();
+
+        if (! $guru) {
+            abort(403, 'Anda bukan guru halaqah');
+        }
+
+        // Ambil halaqah guru ini
+        $halaqah = DataHalaqah::where('teacher_id', $guru->id)->first();
+
+        if (! $halaqah) {
+            abort(403, 'Anda belum memiliki halaqah');
+        }
+
+        // Pastikan setoran ini dari santri di halaqah guru ini
+        if ($setoran->santri->halaqah_id !== $halaqah->id) {
+            abort(403, 'Setoran ini bukan dari santri di halaqah Anda');
+        }
+
+        // Load relasi yang diperlukan
+        $setoran->load(['santri', 'target']);
+
+        // Ambil santri di halaqah ini
+        $santri = Student::where('halaqah_id', $halaqah->id)->get();
+
+        // Ambil target aktif untuk dropdown (dengan filter auto-hide)
+        $allTargets = TargetHafalan::with(['santri'])
+            ->whereHas('santri', function ($query) use ($halaqah) {
+                $query->where('halaqah_id', $halaqah->id);
+            })
+            ->where('status', 'aktif')
+            ->get();
+
+        // Filter target yang belum bisa dihilangkan
+        $targets = $allTargets->filter(function ($target) {
+            return ! $target->bisa_dihilangkan;
+        });
+
+        return Inertia::render('tahfidz/setoran/edit', [
+            'setoran' => $setoran,
+            'santri' => $santri,
+            'surahs' => Surah::orderBy('id')->get(),
+            'targets' => $targets->values()->toArray(), // Konversi Collection ke array
+        ]);
+    }
+
     public function update(Request $request, SetoranHafalan $setoran)
     {
         $user = Auth::user();
 
         // Hanya guru halaqah yang bisa update
-        if (! $user->roles()->where('name', 'Guru Halaqah')->exists()) {
+        if (! $user->roles->contains('name', 'Guru Halaqah')) {
             abort(403, 'Hanya guru halaqah yang bisa update setoran');
         }
 
@@ -221,19 +280,59 @@ class SetoranHafalanController extends Controller
         }
 
         $request->validate([
+            'santri_id' => 'required|exists:students,id',
+            'target_id' => 'nullable|exists:target_hafalan,id',
+            'surah_start' => 'required|integer|min:1|max:114',
+            'ayah_start' => 'required|integer|min:1|max:286',
+            'surah_end' => 'required|integer|min:1|max:114',
+            'ayah_end' => 'required|integer|min:1|max:286',
             'status' => 'required|in:belum_setor,di_ulang,lulus',
             'feedback_guru' => 'nullable|string|max:1000',
             'nilai' => 'nullable|integer|min:1|max:100',
         ]);
 
+        // Pastikan santri ada di halaqah guru ini
+        $santri = Student::where('id', $request->santri_id)
+            ->where('halaqah_id', $halaqah->id)
+            ->first();
+
+        if (! $santri) {
+            return back()->withErrors(['santri_id' => 'Santri tidak ada di halaqah Anda']);
+        }
+
+        // Validasi surah dan ayat
+        $surahStart = Surah::find($request->surah_start);
+        $surahEnd = Surah::find($request->surah_end);
+
+        if (! $surahStart || ! $surahEnd) {
+            return back()->withErrors(['surah' => 'Surah tidak valid']);
+        }
+
+        if ($request->ayah_start > $surahStart->jumlah_ayat) {
+            return back()->withErrors(['ayah_start' => 'Ayat melebihi jumlah ayat surah '.$surahStart->nama_surah]);
+        }
+
+        if ($request->ayah_end > $surahEnd->jumlah_ayat) {
+            return back()->withErrors(['ayah_end' => 'Ayat melebihi jumlah ayat surah '.$surahEnd->nama_surah]);
+        }
+
+        // Convert 'null' string to actual null
+        $targetId = $request->target_id === 'null' ? null : $request->target_id;
+
         $setoran->update([
+            'target_id' => $targetId,
+            'santri_id' => $request->santri_id,
+            'surah_start' => $request->surah_start,
+            'ayah_start' => $request->ayah_start,
+            'surah_end' => $request->surah_end,
+            'ayah_end' => $request->ayah_end,
             'status' => $request->status,
             'feedback_guru' => $request->feedback_guru,
             'nilai' => $request->nilai,
             'tanggal_review' => now(),
         ]);
 
-        return back()->with('success', 'Setoran berhasil diupdate');
+        return to_route('setoran-hafalan.index')->with('success', 'Setoran berhasil diupdate');
     }
 
     public function destroy(SetoranHafalan $setoran)
@@ -241,7 +340,7 @@ class SetoranHafalanController extends Controller
         $user = Auth::user();
 
         // Hanya guru halaqah yang bisa hapus
-        if (! $user->roles()->where('name', 'Guru Halaqah')->exists()) {
+        if (! $user->roles->contains('name', 'Guru Halaqah')) {
             abort(403, 'Hanya guru halaqah yang bisa hapus setoran');
         }
 

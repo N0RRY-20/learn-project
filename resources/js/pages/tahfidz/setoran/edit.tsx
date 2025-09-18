@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem, SetoranCreateProps, SetoranFormData, SetoranStatus } from '@/types';
+import { BreadcrumbItem, SetoranEditProps, SetoranFormData, SetoranStatus } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -12,19 +12,27 @@ const breadcrumbs: BreadcrumbItem[] = [
         title: 'Dashboard',
         href: '/dashboard',
     },
+    {
+        title: 'Setoran Hafalan',
+        href: '/setoran-hafalan',
+    },
+    {
+        title: 'Edit Setoran',
+        href: '#',
+    },
 ];
 
-export default function Create({ santri, surahs, targets }: SetoranCreateProps) {
-    const { data, setData, post, processing, errors, reset } = useForm<SetoranFormData>({
-        santri_id: '',
-        target_id: 'null',
-        surah_start: '',
-        ayah_start: '',
-        surah_end: '',
-        ayah_end: '',
-        status: 'belum_setor',
-        feedback_guru: '',
-        nilai: '',
+export default function Edit({ setoran, santri, surahs, targets }: SetoranEditProps) {
+    const { data, setData, put, processing, errors } = useForm<SetoranFormData>({
+        santri_id: setoran.santri_id.toString(),
+        target_id: setoran.target_id ? setoran.target_id.toString() : 'null',
+        surah_start: setoran.surah_start.toString(),
+        ayah_start: setoran.ayah_start.toString(),
+        surah_end: setoran.surah_end.toString(),
+        ayah_end: setoran.ayah_end.toString(),
+        status: setoran.status,
+        feedback_guru: setoran.feedback_guru || '',
+        nilai: setoran.nilai ? setoran.nilai.toString() : '',
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -33,10 +41,10 @@ export default function Create({ santri, surahs, targets }: SetoranCreateProps) 
             ...data,
             target_id: data.target_id === 'null' ? null : data.target_id,
         };
-        post(route('setoran-hafalan.store'), {
+        put(route('setoran-hafalan.update', setoran.id), {
             ...formData,
             onSuccess: () => {
-                reset();
+                window.location.href = route('setoran-hafalan.index');
             },
         });
     };
@@ -45,11 +53,11 @@ export default function Create({ santri, surahs, targets }: SetoranCreateProps) 
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Dashboard" />
+            <Head title="Edit Setoran Hafalan" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <Card>
                     <CardHeader>
-                        <CardTitle>Input Setoran Hafalan Santri</CardTitle>
+                        <CardTitle>Edit Setoran Hafalan Santri</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-4">
@@ -192,9 +200,14 @@ export default function Create({ santri, surahs, targets }: SetoranCreateProps) 
                                 />
                             </div>
 
-                            <Button type="submit" disabled={processing}>
-                                {processing ? 'Menyimpan...' : 'Simpan Setoran'}
-                            </Button>
+                            <div className="flex gap-2">
+                                <Button type="submit" disabled={processing}>
+                                    {processing ? 'Menyimpan...' : 'Update Setoran'}
+                                </Button>
+                                <Button type="button" variant="outline" onClick={() => window.history.back()}>
+                                    Batal
+                                </Button>
+                            </div>
                         </form>
                     </CardContent>
                 </Card>

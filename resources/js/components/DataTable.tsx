@@ -23,7 +23,7 @@ interface DataTableProps<TData, TValue> {
     filterColumn?: string;
 }
 
-export function DataTable<TData, TValue>({ columns, data, meta, filterColumn }: DataTableProps<TData, TValue> & { meta?: any }) {
+export function DataTable<TData, TValue>({ columns, data, meta, filterColumn }: DataTableProps<TData, TValue> & { meta?: Record<string, unknown> }) {
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
     const table = useReactTable({
