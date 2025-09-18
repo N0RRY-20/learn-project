@@ -24,8 +24,7 @@ export default function Create({ santri, surahs, message }: MurojaahCreateProps)
         surah_start: '',
         ayah_start: '',
         surah_end: '',
-        ayah_end: '',
-        tanggal_murojaah: new Date().toISOString().split('T')[0], // Set default ke hari ini
+        ayah_end: '', // Set default ke hari ini
         status: 'Perlu Diulang',
         nilai: '',
         catatan: '',
@@ -139,17 +138,6 @@ export default function Create({ santri, surahs, message }: MurojaahCreateProps)
                             </div>
 
                             {/* Tanggal Murojaah */}
-                            <div>
-                                <Label htmlFor="tanggal_murojaah">Tanggal Murojaah</Label>
-                                <Input
-                                    id="tanggal_murojaah"
-                                    type="date"
-                                    value={data.tanggal_murojaah}
-                                    onChange={(e) => setData('tanggal_murojaah', e.target.value)}
-                                    required
-                                />
-                                {errors.tanggal_murojaah && <p className="text-sm text-red-500">{errors.tanggal_murojaah}</p>}
-                            </div>
 
                             {/* Status & Nilai */}
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">

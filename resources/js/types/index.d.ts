@@ -224,7 +224,7 @@ export interface MurojaahFormData {
     surah_end: string;
     ayah_end: string;
     status: MurojaahStatus;
-    tanggal_murojaah: string;
+
     nilai: string;
     catatan: string;
 }
