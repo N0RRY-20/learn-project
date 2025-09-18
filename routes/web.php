@@ -5,6 +5,7 @@ use App\Http\Controllers\admin\DataKelasController;
 use App\Http\Controllers\admin\StudentController;
 use App\Http\Controllers\admin\TeachersDataController;
 use App\Http\Controllers\admin\UserDataController;
+use App\Http\Controllers\GuruHalaqah\MurojaahController;
 use App\Http\Controllers\SetoranHafalanController;
 use App\Http\Controllers\TargetHafalanController;
 use Illuminate\Support\Facades\Route;
@@ -81,6 +82,14 @@ Route::middleware(['auth', 'GuruHalaqah'])->group(function () {
     Route::post('target-hafalan', [TargetHafalanController::class, 'store'])->name('target-hafalan.store');
     Route::put('target-hafalan/{target}', [TargetHafalanController::class, 'update'])->name('target-hafalan.update');
     Route::delete('target-hafalan/{target}', [TargetHafalanController::class, 'destroy'])->name('target-hafalan.destroy');
+
+    // Murojaah (Hanya Guru)
+    Route::get('murojaah', [MurojaahController::class, 'index'])->name('murojaah.index');
+    Route::get('murojaah/create', [MurojaahController::class, 'create'])->name('murojaah.create');
+    Route::get('murojaah/{murojaah}/edit', [MurojaahController::class, 'edit'])->name('murojaah.edit');
+    Route::post('murojaah', [MurojaahController::class, 'store'])->name('murojaah.store');
+    Route::put('murojaah/{murojaah}', [MurojaahController::class, 'update'])->name('murojaah.update');
+    Route::delete('murojaah/{murojaah}', [MurojaahController::class, 'destroy'])->name('murojaah.destroy');
 });
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

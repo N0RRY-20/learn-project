@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             SurahAyahJuzSeeder::class,
             RoleSeeder::class,
             TeachersDataSeeder::class,
+
         ]);
         // User::factory(3)->create();
         // TeachersData::factory(3)->create();

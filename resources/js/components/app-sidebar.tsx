@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { Auth, roles, type NavGroup, type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, GraduationCap, LayoutGrid, LucideBinoculars, LucideNotebookPen, Target, UserCheck2Icon } from 'lucide-react';
+import { BookOpen, Folder, GraduationCap, LampFloor, LayoutGrid, LucideBinoculars, LucideNotebookPen, Target, UserCheck2Icon } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const sidebarNavGroups: NavGroup[] = [
@@ -59,6 +59,12 @@ const sidebarNavGroups: NavGroup[] = [
                 title: 'Setoran Hafalan',
                 href: '/setoran-hafalan',
                 icon: LucideNotebookPen,
+                roles: ['Guru Halaqah'],
+            },
+            {
+                title: 'Murojaah Hafalan',
+                href: '/murojaah',
+                icon: LampFloor,
                 roles: ['Guru Halaqah'],
             },
 

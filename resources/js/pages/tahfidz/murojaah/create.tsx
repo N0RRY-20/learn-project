@@ -4,93 +4,77 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem, SetoranCreateProps, SetoranFormData, SetoranStatus } from '@/types';
+import { BreadcrumbItem, MurojaahFormData, MurojaahStatus } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Dashboard',
-        href: '/dashboard',
-    },
+    { title: 'Dashboard', href: '/dashboard' },
+    { title: 'Murojaah Hafalan', href: '/murojaah' },
 ];
 
-export default function Create({ santri, surahs, targets }: SetoranCreateProps) {
-    const { data, setData, post, processing, errors, reset } = useForm<SetoranFormData>({
-        santri_id: '',
-        target_id: 'null',
+interface MurojaahCreateProps {
+    santri: { id: number; name: string }[];
+    surahs: { id: number; nama_surah: string }[];
+    message?: string;
+}
+
+export default function Create({ santri, surahs, message }: MurojaahCreateProps) {
+    const { data, setData, post, processing, errors, reset } = useForm<MurojaahFormData>({
+        student_id: '',
         surah_start: '',
         ayah_start: '',
         surah_end: '',
         ayah_end: '',
-        status: 'belum_setor',
-        feedback_guru: '',
+        tanggal_murojaah: new Date().toISOString().split('T')[0], // Set default ke hari ini
+        status: 'Perlu Diulang',
         nilai: '',
+        catatan: '',
     });
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Convert 'null' back to null for backend
-        const formData = {
-            ...data,
-            target_id: data.target_id === 'null' ? null : data.target_id,
-        };
-        post(route('setoran-hafalan.store'), {
-            ...formData,
-            onSuccess: () => {
-                reset();
-            },
-        });
+        post(route('murojaah.store'), { onSuccess: () => reset() });
     };
 
-    const filteredTargets = data.santri_id ? targets.filter((target) => target.santri_id.toString() === data.santri_id) : [];
+    // Kalau tidak ada halaqah
+    if (message) {
+        return (
+            <AppLayout breadcrumbs={breadcrumbs}>
+                <Head title="Tambah Murojaah Hafalan" />
+                <div className="p-6 text-center text-red-500">{message}</div>
+            </AppLayout>
+        );
+    }
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Dashboard" />
+            <Head title="Tambah Murojaah Hafalan" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <Card>
                     <CardHeader>
-                        <CardTitle>Input Setoran Hafalan Santri</CardTitle>
+                        <CardTitle>Input Murojaah Santri/SantriWati</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-4">
-                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                <div>
-                                    <Label htmlFor="santri_id">Santri</Label>
-                                    <Select value={data.santri_id} onValueChange={(value) => setData('santri_id', value)}>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Pilih Santri" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {santri.map((s) => (
-                                                <SelectItem key={s.id} value={s.id.toString()}>
-                                                    {s.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    {errors.santri_id && <p className="text-sm text-red-500">{errors.santri_id}</p>}
-                                </div>
-
-                                <div>
-                                    <Label htmlFor="target_id">Target Hafalan (Opsional)</Label>
-                                    <Select value={data.target_id} onValueChange={(value) => setData('target_id', value)}>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Pilih Target (Opsional)" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="null">Tanpa Target</SelectItem>
-                                            {filteredTargets.map((target) => (
-                                                <SelectItem key={target.id} value={target.id.toString()}>
-                                                    {target.surah_start === target.surah_end
-                                                        ? `Surah ${target.surah_start} Ayat ${target.ayah_start}-${target.ayah_end}`
-                                                        : `Surah ${target.surah_start}:${target.ayah_start} - Surah ${target.surah_end}:${target.ayah_end}`}{' '}
-                                                    ({new Date(target.tanggal_target).toLocaleDateString('id-ID')})
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
+                            {/* Santri */}
+                            <div>
+                                <Label htmlFor="student_id">Santri</Label>
+                                <Select value={data.student_id} onValueChange={(value) => setData('student_id', value)}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Pilih Santri" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {santri.map((s) => (
+                                            <SelectItem key={s.id} value={s.id.toString()}>
+                                                {s.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                {errors.student_id && <p className="text-sm text-red-500">{errors.student_id}</p>}
                             </div>
 
+                            {/* Surah & Ayat Start */}
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div>
                                     <Label htmlFor="surah_start">Surah Mulai</Label>
@@ -108,20 +92,21 @@ export default function Create({ santri, surahs, targets }: SetoranCreateProps) 
                                     </Select>
                                     {errors.surah_start && <p className="text-sm text-red-500">{errors.surah_start}</p>}
                                 </div>
-
                                 <div>
-                                    <Label htmlFor="ayah_start">Ayat Mulai</Label>
+                                    <Label htmlFor="ayat_awal">Ayat Mulai</Label>
                                     <Input
-                                        id="ayah_start"
+                                        id="ayat_awal"
                                         type="number"
                                         value={data.ayah_start}
                                         onChange={(e) => setData('ayah_start', e.target.value)}
                                         min="1"
+                                        required
                                     />
                                     {errors.ayah_start && <p className="text-sm text-red-500">{errors.ayah_start}</p>}
                                 </div>
                             </div>
 
+                            {/* Surah & Ayat End */}
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div>
                                     <Label htmlFor="surah_end">Surah Selesai</Label>
@@ -139,60 +124,76 @@ export default function Create({ santri, surahs, targets }: SetoranCreateProps) 
                                     </Select>
                                     {errors.surah_end && <p className="text-sm text-red-500">{errors.surah_end}</p>}
                                 </div>
-
                                 <div>
-                                    <Label htmlFor="ayah_end">Ayat Selesai</Label>
+                                    <Label htmlFor="ayat_akhir">Ayat Selesai</Label>
                                     <Input
-                                        id="ayah_end"
+                                        id="ayat_akhir"
                                         type="number"
                                         value={data.ayah_end}
                                         onChange={(e) => setData('ayah_end', e.target.value)}
                                         min="1"
+                                        required
                                     />
                                     {errors.ayah_end && <p className="text-sm text-red-500">{errors.ayah_end}</p>}
                                 </div>
                             </div>
 
+                            {/* Tanggal Murojaah */}
+                            <div>
+                                <Label htmlFor="tanggal_murojaah">Tanggal Murojaah</Label>
+                                <Input
+                                    id="tanggal_murojaah"
+                                    type="date"
+                                    value={data.tanggal_murojaah}
+                                    onChange={(e) => setData('tanggal_murojaah', e.target.value)}
+                                    required
+                                />
+                                {errors.tanggal_murojaah && <p className="text-sm text-red-500">{errors.tanggal_murojaah}</p>}
+                            </div>
+
+                            {/* Status & Nilai */}
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div>
                                     <Label htmlFor="status">Status</Label>
-                                    <Select value={data.status} onValueChange={(value: SetoranStatus) => setData('status', value)}>
+                                    <Select value={data.status} onValueChange={(value: MurojaahStatus) => setData('status', value)}>
                                         <SelectTrigger>
-                                            <SelectValue />
+                                            <SelectValue placeholder="Pilih Status" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="belum_setor">Belum Setor</SelectItem>
-                                            <SelectItem value="di_ulang">Di Ulang</SelectItem>
-                                            <SelectItem value="lulus">Lulus</SelectItem>
+                                            <SelectItem value="Perlu Diulang">Perlu Diulang</SelectItem>
+                                            <SelectItem value="Lulus">Lulus</SelectItem>
                                         </SelectContent>
                                     </Select>
+                                    {errors.status && <p className="text-sm text-red-500">{errors.status}</p>}
                                 </div>
-
                                 <div>
-                                    <Label htmlFor="nilai">Nilai (1-100)</Label>
+                                    <Label htmlFor="nilai">Nilai</Label>
                                     <Input
                                         id="nilai"
                                         type="number"
                                         value={data.nilai}
                                         onChange={(e) => setData('nilai', e.target.value)}
-                                        min="1"
+                                        min="0"
                                         max="100"
                                     />
+                                    {errors.nilai && <p className="text-sm text-red-500">{errors.nilai}</p>}
                                 </div>
                             </div>
 
+                            {/* Catatan */}
                             <div>
-                                <Label htmlFor="feedback_guru">Feedback Guru</Label>
+                                <Label htmlFor="catatan">Catatan</Label>
                                 <Input
-                                    id="feedback_guru"
-                                    value={data.feedback_guru}
-                                    onChange={(e) => setData('feedback_guru', e.target.value)}
-                                    placeholder="Masukkan feedback untuk santri"
+                                    id="catatan"
+                                    value={data.catatan}
+                                    onChange={(e) => setData('catatan', e.target.value)}
+                                    placeholder="Masukkan catatan"
                                 />
+                                {errors.catatan && <p className="text-sm text-red-500">{errors.catatan}</p>}
                             </div>
 
                             <Button type="submit" disabled={processing}>
-                                {processing ? 'Menyimpan...' : 'Simpan Setoran'}
+                                {processing ? 'Menyimpan...' : 'Simpan'}
                             </Button>
                         </form>
                     </CardContent>

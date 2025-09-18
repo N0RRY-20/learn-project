@@ -196,3 +196,38 @@ export interface Target {
     // tambahan saat flatten di frontend
     tanggal_group?: string;
 }
+
+export interface Murojaah {
+    id: number;
+    student_id: number;
+    teacher_id?: number | null;
+    surah_start: number;
+    ayah_start: number;
+    surah_end: number;
+    ayah_end: number;
+    tanggal_murojaah: string;
+    status: 'Lulus' | 'Perlu Diulang';
+    nilai?: number | null;
+    catatan?: string | null;
+    created_at?: string;
+    updated_at?: string;
+
+    // Relasi
+    student: Student;
+    teacher?: User | null;
+}
+// Form data untuk create Murojaah
+export interface MurojaahFormData {
+    student_id: string;
+    surah_start: string;
+    ayah_start: string;
+    surah_end: string;
+    ayah_end: string;
+    status: MurojaahStatus;
+    tanggal_murojaah: string;
+    nilai: string;
+    catatan: string;
+}
+
+// Status Murojaah
+export type MurojaahStatus = 'belum_setor' | 'Perlu Diulang' | 'Lulus';
