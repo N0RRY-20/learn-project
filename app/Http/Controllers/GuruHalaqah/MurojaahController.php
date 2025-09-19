@@ -32,6 +32,7 @@ class MurojaahController extends Controller
 
         return Inertia::render('tahfidz/murojaah/index', [
             'murojaah' => $murojaah,
+            'surahs' => Surah::orderBy('id')->get(),
         ]);
     }
 

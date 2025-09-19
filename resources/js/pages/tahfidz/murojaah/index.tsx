@@ -1,7 +1,7 @@
 import { DataTable } from '@/components/DataTable';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem, Murojaah } from '@/types';
+import { BreadcrumbItem, Murojaah, Surah } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { columns } from './column';
 
@@ -13,9 +13,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 export interface MurojaahPageProps {
     murojaah: Murojaah[];
+    surahs: Surah[];
 }
 
-export default function Index({ murojaah }: MurojaahPageProps) {
+export default function Index({ murojaah, surahs }: MurojaahPageProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Murojaah Hafalan" />
@@ -25,7 +26,14 @@ export default function Index({ murojaah }: MurojaahPageProps) {
                         <Button>Tambah Murojaah Hafalan</Button>
                     </Link>
                 </div>
-                <DataTable columns={columns} data={murojaah} filterColumn="student" />
+                <DataTable
+                    columns={columns}
+                    data={murojaah}
+                    filterColumn="student"
+                    meta={{
+                        surahMap: Object.fromEntries(surahs.map((s) => [s.id, s.nama_surah])),
+                    }}
+                />
             </div>
         </AppLayout>
     );

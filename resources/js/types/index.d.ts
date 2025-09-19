@@ -160,11 +160,6 @@ export interface SetoranFormData {
     tanggal_review?: string; // optional
 }
 
-export interface SetoranPageProps {
-    setorans: Setoran[];
-    surahs: Surah[];
-}
-
 export interface SetoranCreateProps {
     santri: Student[];
     surahs: Surah[];

@@ -1,7 +1,7 @@
 import { DataTable } from '@/components/DataTable';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem, SetoranPageProps } from '@/types';
+import { BreadcrumbItem, Setoran, Surah } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { columns } from './column';
 
@@ -11,7 +11,10 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/dashboard',
     },
 ];
-
+export interface SetoranPageProps {
+    setorans: Setoran[];
+    surahs: Surah[];
+}
 export default function SetoranHafalanIndex({ setorans, surahs }: SetoranPageProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
