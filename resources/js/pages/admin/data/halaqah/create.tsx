@@ -3,9 +3,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem, PageProps, Student, Teacher } from '@/types';
+import { BreadcrumbItem, DataKelas, PageProps, Student, Teacher } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { LoaderCircle, PlusCircle, XCircle } from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -21,9 +22,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 // Definisikan tipe props yang akan diterima dari controller
 type CreateProps = PageProps & {
     students: Student[];
-    teachers: Teacher[]; // Array siswa yang belum punya kelas
+    teachers: Teacher[];
+    kelas: DataKelas[]; // Array siswa yang belum punya kelas
 };
-export default function Create({ teachers, students }: CreateProps) {
+export default function Create({ teachers, students, kelas }: CreateProps) {
     const { data, setData, post, processing, errors } = useForm({
         nama_halaqah: '',
         teacher_id: '',
@@ -31,6 +33,27 @@ export default function Create({ teachers, students }: CreateProps) {
         // Kita mulai dengan satu baris siswa kosong
         students: [{ student_id: '' }],
     });
+
+    // State filter
+    const [filterClassId, setFilterClassId] = useState<string>('');
+    const [filterGender, setFilterGender] = useState<'All' | Student['gender']>('All');
+
+    // Opsi kelas: urutkan berdasarkan nama
+    const classOptions = useMemo(() => {
+        return [...kelas].sort((a, b) => a.nama_kelas.localeCompare(b.nama_kelas));
+    }, [kelas]);
+
+    // Utility: normalisasi gender agar tahan perbedaan kapitalisasi/strip
+    const normalizeGender = (val?: string) => (val || '').toLowerCase().replace(/-/g, '').trim();
+
+    // Daftar siswa yang sudah difilter berdasarkan kelas & gender
+    const filteredStudentsBase = useMemo(() => {
+        return students.filter((s) => {
+            const matchesClass = filterClassId ? s.kelas_id === Number(filterClassId) : true;
+            const matchesGender = filterGender === 'All' ? true : normalizeGender(s.gender) === normalizeGender(filterGender);
+            return matchesClass && matchesGender;
+        });
+    }, [students, filterClassId, filterGender]);
 
     const handleStudentChange = (index: number, student_id: string) => {
         const updatedStudents = [...data.students];
@@ -51,7 +74,7 @@ export default function Create({ teachers, students }: CreateProps) {
 
     const getAvailableStudents = () => {
         const selectedStudentIds = data.students.map((s) => s.student_id).filter(Boolean);
-        return students.filter((student) => !selectedStudentIds.includes(student.id.toString()));
+        return filteredStudentsBase.filter((student) => !selectedStudentIds.includes(student.id.toString()));
     };
 
     const submit = (e: React.FormEvent) => {
@@ -99,6 +122,64 @@ export default function Create({ teachers, students }: CreateProps) {
                         <InputError message={errors.teacher_id} className="mt-2" />
                     </div>
 
+                    {/* Filter Siswa */}
+                    <div className="grid gap-4 rounded-md border border-gray-200 p-4 dark:border-gray-700">
+                        <Label>Filter Siswa</Label>
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                            <div className="grid gap-2">
+                                <Label htmlFor="filter_class">Berdasarkan Kelas</Label>
+                                <select
+                                    id="filter_class"
+                                    value={filterClassId}
+                                    onChange={(e) => setFilterClassId(e.target.value)}
+                                    className="w-full rounded-md border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700"
+                                >
+                                    <option value="">Semua Kelas</option>
+                                    {classOptions.map((k) => (
+                                        <option key={k.id} value={k.id}>
+                                            {k.nama_kelas}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="grid gap-2 md:col-span-2">
+                                <Label>Gender</Label>
+                                <div className="flex flex-wrap items-center gap-4">
+                                    <label className="inline-flex items-center gap-2">
+                                        <input
+                                            type="radio"
+                                            name="gender_filter"
+                                            value="All"
+                                            checked={filterGender === 'All'}
+                                            onChange={() => setFilterGender('All')}
+                                        />
+                                        <span>Semua</span>
+                                    </label>
+                                    <label className="inline-flex items-center gap-2">
+                                        <input
+                                            type="radio"
+                                            name="gender_filter"
+                                            value="Laki-laki"
+                                            checked={filterGender === 'Laki-laki'}
+                                            onChange={() => setFilterGender('Laki-laki')}
+                                        />
+                                        <span>Laki-laki</span>
+                                    </label>
+                                    <label className="inline-flex items-center gap-2">
+                                        <input
+                                            type="radio"
+                                            name="gender_filter"
+                                            value="Perempuan"
+                                            checked={filterGender === 'Perempuan'}
+                                            onChange={() => setFilterGender('Perempuan')}
+                                        />
+                                        <span>Perempuan</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div className="grid gap-4">
                         <Label>Siswa</Label>
                         {data.students.map((student, index) => (
@@ -117,7 +198,7 @@ export default function Create({ teachers, students }: CreateProps) {
                                             {students.find((s) => s.id.toString() === student.student_id)?.name}
                                         </option>
                                     )}
-                                    {/* Opsi untuk siswa lain yang belum dipilih */}
+                                    {/* Opsi untuk siswa lain yang belum dipilih sesuai filter */}
                                     {getAvailableStudents().map((s) => (
                                         <option key={s.id} value={s.id}>
                                             {s.name}

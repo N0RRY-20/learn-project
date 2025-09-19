@@ -33,7 +33,7 @@ export const columns: ColumnDef<User>[] = [
         accessorKey: 'email',
         header: 'Email',
     },
-    { accessorFn: (row) => row.roles.map((r: any) => r.name).join(', '), id: 'peran', header: 'Peran' },
+    { accessorFn: (row) => row.roles.map((r) => r.name).join(', '), id: 'peran', header: 'Peran' },
 
     // Actions column
     {

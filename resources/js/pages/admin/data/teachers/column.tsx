@@ -35,7 +35,7 @@ export const columns: ColumnDef<Teacher>[] = [
         header: 'Email',
     },
     {
-        accessorFn: (row) => row.user?.roles.map((r: any) => r.name).join(', '),
+        accessorFn: (row) => (row.user?.roles ?? []).map((r) => r.name).join(', '),
         id: 'peran',
         header: 'Peran',
     },

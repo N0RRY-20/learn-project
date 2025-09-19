@@ -4,6 +4,7 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\DataHalaqah;
+use App\Models\DataKelas;
 use App\Models\Student;
 use App\Models\TeachersData;
 use Illuminate\Support\Facades\DB;
@@ -28,8 +29,9 @@ class DataHalaqahController extends Controller
             ->with(['user.roles']) // biar relasinya langsung ikut di-load
             ->orderBy('id', 'asc')
             ->get();
+        $kelas = DataKelas::all();
 
-        return Inertia::render('admin/data/halaqah/create', compact('teachers', 'students'));
+        return Inertia::render('admin/data/halaqah/create', compact('teachers', 'students', 'kelas'));
     }
 
     public function store()
@@ -79,8 +81,9 @@ class DataHalaqahController extends Controller
             ->get();
 
         $availableStudents = Student::whereNull('halaqah_id')->orWhere('halaqah_id', $datahalaqah->id)->get();
+        $kelas = DataKelas::all();
 
-        return Inertia::render('admin/data/halaqah/edit', compact('datahalaqah', 'teachers', 'availableStudents'));
+        return Inertia::render('admin/data/halaqah/edit', compact('datahalaqah', 'teachers', 'availableStudents', 'kelas'));
     }
 
     public function update(DataHalaqah $datahalaqah)

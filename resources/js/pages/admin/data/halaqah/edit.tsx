@@ -3,9 +3,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem, DataHalaqah, PageProps, Student, Teacher } from '@/types';
+import { BreadcrumbItem, DataHalaqah, DataKelas, PageProps, Student, Teacher } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { LoaderCircle, PlusCircle, XCircle } from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -25,8 +26,9 @@ type EditProps = PageProps & {
     };
     availableStudents: Student[]; // Siswa yang bisa dipilih
     teachers: Teacher[];
+    kelas: DataKelas[];
 };
-export default function Edit({ datahalaqah, availableStudents, teachers }: EditProps) {
+export default function Edit({ datahalaqah, availableStudents, teachers, kelas }: EditProps) {
     const { data, setData, post, processing, errors } = useForm({
         nama_halaqah: datahalaqah.nama_halaqah || '',
         teacher_id: datahalaqah.teacher_id || '',
@@ -34,6 +36,26 @@ export default function Edit({ datahalaqah, availableStudents, teachers }: EditP
         // Kita mulai dengan satu baris siswa kosong
         students: datahalaqah.students.length > 0 ? datahalaqah.students.map((s) => ({ student_id: s.id.toString() })) : [{ student_id: '' }],
     });
+
+    // State filter
+    const [filterClassId, setFilterClassId] = useState<string>('');
+    const [filterGender, setFilterGender] = useState<'All' | Student['gender']>('All');
+
+    // Opsi kelas: urutkan berdasarkan nama
+    const classOptions = useMemo(() => {
+        return [...kelas].sort((a, b) => a.nama_kelas.localeCompare(b.nama_kelas));
+    }, [kelas]);
+
+    const normalizeGender = (val?: string) => (val || '').toLowerCase().replace(/-/g, '').trim();
+
+    // Basis siswa yang difilter dari availableStudents (yang boleh dipilih di halaman edit)
+    const filteredAvailableBase = useMemo(() => {
+        return availableStudents.filter((s) => {
+            const matchesClass = filterClassId ? s.kelas_id === Number(filterClassId) : true;
+            const matchesGender = filterGender === 'All' ? true : normalizeGender(s.gender) === normalizeGender(filterGender);
+            return matchesClass && matchesGender;
+        });
+    }, [availableStudents, filterClassId, filterGender]);
 
     const handleStudentChange = (index: number, student_id: string) => {
         const updatedStudents = [...data.students];
@@ -54,7 +76,7 @@ export default function Edit({ datahalaqah, availableStudents, teachers }: EditP
 
     const getAvailableStudents = () => {
         const selectedStudentIds = data.students.map((s) => s.student_id).filter(Boolean);
-        return availableStudents.filter((student) => !selectedStudentIds.includes(student.id.toString()));
+        return filteredAvailableBase.filter((student) => !selectedStudentIds.includes(student.id.toString()));
     };
 
     const submit = (e: React.FormEvent) => {
@@ -102,6 +124,64 @@ export default function Edit({ datahalaqah, availableStudents, teachers }: EditP
                         <InputError message={errors.teacher_id} className="mt-2" />
                     </div>
 
+                    {/* Filter Siswa */}
+                    <div className="grid gap-4 rounded-md border border-gray-200 p-4 dark:border-gray-700">
+                        <Label>Filter Siswa</Label>
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                            <div className="grid gap-2">
+                                <Label htmlFor="filter_class">Berdasarkan Kelas</Label>
+                                <select
+                                    id="filter_class"
+                                    value={filterClassId}
+                                    onChange={(e) => setFilterClassId(e.target.value)}
+                                    className="w-full rounded-md border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700"
+                                >
+                                    <option value="">Semua Kelas</option>
+                                    {classOptions.map((k) => (
+                                        <option key={k.id} value={k.id}>
+                                            {k.nama_kelas}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="grid gap-2 md:col-span-2">
+                                <Label>Gender</Label>
+                                <div className="flex flex-wrap items-center gap-4">
+                                    <label className="inline-flex items-center gap-2">
+                                        <input
+                                            type="radio"
+                                            name="gender_filter"
+                                            value="All"
+                                            checked={filterGender === 'All'}
+                                            onChange={() => setFilterGender('All')}
+                                        />
+                                        <span>Semua</span>
+                                    </label>
+                                    <label className="inline-flex items-center gap-2">
+                                        <input
+                                            type="radio"
+                                            name="gender_filter"
+                                            value="Laki-laki"
+                                            checked={filterGender === 'Laki-laki'}
+                                            onChange={() => setFilterGender('Laki-laki')}
+                                        />
+                                        <span>Laki-laki</span>
+                                    </label>
+                                    <label className="inline-flex items-center gap-2">
+                                        <input
+                                            type="radio"
+                                            name="gender_filter"
+                                            value="Perempuan"
+                                            checked={filterGender === 'Perempuan'}
+                                            onChange={() => setFilterGender('Perempuan')}
+                                        />
+                                        <span>Perempuan</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div className="grid gap-4">
                         <Label>Siswa</Label>
                         {data.students.map((student, index) => (
@@ -120,7 +200,7 @@ export default function Edit({ datahalaqah, availableStudents, teachers }: EditP
                                             {availableStudents.find((s) => s.id.toString() === student.student_id)?.name}
                                         </option>
                                     )}
-                                    {/* Opsi untuk siswa lain yang belum dipilih */}
+                                    {/* Opsi untuk siswa lain yang belum dipilih sesuai filter */}
                                     {getAvailableStudents().map((s) => (
                                         <option key={s.id} value={s.id}>
                                             {s.name}

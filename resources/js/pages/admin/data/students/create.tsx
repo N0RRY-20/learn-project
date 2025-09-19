@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem } from '@/types';
+import { BreadcrumbItem, DataKelas } from '@/types';
 import { Form, Head } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
@@ -21,7 +21,11 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function create() {
+type CreateProps = {
+    kelas: DataKelas[];
+};
+
+export default function Create({ kelas }: CreateProps) {
     const [jenisKelamin, setJenisKelamin] = useState('');
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -50,18 +54,19 @@ export default function create() {
                                     <Input id="nisn" type="text" required tabIndex={2} autoComplete="nisn" name="nisn" placeholder="NISN" />
                                     <InputError message={errors.nisn ? 'NISN wajib diisi dan harus valid' : ''} className="mt-2" />
                                 </div>
+
+                                {/* Pilih Kelas */}
                                 <div className="grid gap-2">
-                                    <Label htmlFor="class_level">Kelas</Label>
-                                    <Input
-                                        id="class_level"
-                                        type="text"
-                                        required
-                                        tabIndex={2}
-                                        autoComplete="class_level"
-                                        name="class_level"
-                                        placeholder="Kelas"
-                                    />
-                                    <InputError message={errors.class_level ? 'Kelas wajib diisi dan harus valid' : ''} className="mt-2" />
+                                    <Label htmlFor="kelas_id">Kelas</Label>
+                                    <select id="kelas_id" name="kelas_id" className="h-10 rounded-md border px-3 py-2" tabIndex={3} defaultValue="">
+                                        <option value="">Pilih Kelas</option>
+                                        {kelas?.map((k) => (
+                                            <option key={k.id} value={k.id}>
+                                                {k.nama_kelas}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <InputError message={errors.kelas_id ? 'Kelas harus valid' : ''} className="mt-2" />
                                 </div>
 
                                 {/* Jenis Kelamin */}
@@ -85,7 +90,7 @@ export default function create() {
                                     <InputError message={errors.address ? 'Alamat wajib diisi' : ''} className="mt-2" />
                                 </div>
                                 <div className="grid gap-2">
-                                    <CalendarField />
+                                    <CalendarField label="Tanggal Lahir" name="birth_date" />
                                 </div>
 
                                 <div className="grid gap-2">

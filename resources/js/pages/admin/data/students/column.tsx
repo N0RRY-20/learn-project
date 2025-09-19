@@ -23,6 +23,8 @@ export const columns: ColumnDef<Student>[] = [
         id: 'no',
         header: 'NO',
         cell: ({ row }) => row.index + 1,
+        enableSorting: false,
+        enableHiding: false,
     },
     {
         accessorKey: 'name',
@@ -33,12 +35,15 @@ export const columns: ColumnDef<Student>[] = [
         header: 'NISN',
     },
     {
-        accessorKey: 'class_level',
-        header: 'Tingkat Kelas',
+        id: 'kelas',
+        header: 'Kelas',
+        accessorFn: (row: Student) => row.dataKelas?.nama_kelas ?? row.data_kelas?.nama_kelas ?? '-',
+        filterFn: 'includesString',
     },
     {
         accessorKey: 'gender',
         header: 'Jenis Kelamin',
+        filterFn: 'includesString',
     },
     {
         accessorKey: 'birth_date',

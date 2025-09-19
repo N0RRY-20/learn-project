@@ -9,7 +9,7 @@ import { Form, Head } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
 
-export default function edit({ user }: { user: User }) {
+export default function Edit({ user }: { user: User }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Data Users',

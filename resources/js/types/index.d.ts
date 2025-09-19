@@ -68,14 +68,18 @@ export interface Student {
     id: number;
     name: string;
     nisn: string;
-    class_level: string;
+
     birth_date: string; // Saat dikirim melalui API, tanggal biasanya berupa string (format ISO)
     gender: 'Laki-laki' | 'Perempuan'; // Tipe literal untuk pilihan yang pasti
     address: string;
     phone_number: string;
     parent_name: string;
     parent_occupation: string | null; // Bisa string atau null, karena nullable di database
-    kelas_id: number;
+    // kelas_id menyimpan id numerik atau null jika belum memiliki kelas
+    kelas_id: number | null;
+    // Relasi opsional (payload bisa camelCase atau snake_case)
+    dataKelas?: DataKelas | null;
+    data_kelas?: DataKelas | null;
 
     // Timestamps dari Laravel
     created_at: string;

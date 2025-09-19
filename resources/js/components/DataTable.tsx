@@ -13,6 +13,7 @@ import {
     useReactTable,
     VisibilityState,
 } from '@tanstack/react-table';
+import type { Table as ReactTable } from '@tanstack/react-table';
 import { ChevronDown } from 'lucide-react';
 import * as React from 'react';
 import { Input } from './ui/input';
@@ -21,9 +22,11 @@ interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
     filterColumn?: string;
+    // Tambahan: fungsi untuk merender filter ekstra (menerima instance table)
+    renderFilters?: (table: ReactTable<TData>) => React.ReactNode;
 }
 
-export function DataTable<TData, TValue>({ columns, data, meta, filterColumn }: DataTableProps<TData, TValue> & { meta?: Record<string, unknown> }) {
+export function DataTable<TData, TValue>({ columns, data, meta, filterColumn, renderFilters }: DataTableProps<TData, TValue> & { meta?: Record<string, unknown> }) {
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
     const table = useReactTable({
@@ -50,6 +53,9 @@ export function DataTable<TData, TValue>({ columns, data, meta, filterColumn }: 
                     onChange={(event) => table.getColumn(filterColumn ?? 'name')?.setFilterValue(event.target.value)}
                     className="max-w-sm"
                 />
+
+                {/* Filter tambahan yang dikirim dari halaman pemanggil */}
+                {renderFilters && <div className="mx-4 flex items-center gap-2">{renderFilters(table)}</div>}
 
                 <div className="mx-4 flex items-center justify-between gap-3">
                     <DropdownMenu>

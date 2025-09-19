@@ -5,43 +5,44 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem, Student } from '@/types';
+import { BreadcrumbItem, DataKelas, Student } from '@/types';
 import { Form, Head } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
 
-type StudentProps = {
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Data Santri/Santriwati',
+        href: route('students'),
+    },
+    {
+        title: 'Edit Data',
+        href: route('students'),
+    },
+];
+
+type EditProps = {
     student: Student;
+    kelas: DataKelas[];
 };
-export default function Edit({ student }: StudentProps) {
-    const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Data Santri/Santriwati',
-            href: route('students'),
-        },
-        {
-            title: 'Edit Data',
-            href: route('students.edit', student.id),
-        },
-        {
-            title: student.name,
-            href: '#',
-        },
-    ];
-    const [jenisKelamin, setJenisKelamin] = useState<string>(student.gender || '');
+
+export default function Edit({ student, kelas }: EditProps) {
+    const [jenisKelamin, setJenisKelamin] = useState(student.gender ?? '');
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Menu Tahfidz" />
+            <Head title="Edit Data Santri" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <Form
-                    method="put"
-                    action={route('students.update', student.id)}
+                    method="post"
+                    action={route('students.update', { student: student.id })}
                     disableWhileProcessing
                     resetOnSuccess
                     className="flex flex-col gap-6"
                 >
                     {({ processing, errors }) => (
                         <>
+                            <input type="hidden" name="_method" value="put" />
                             <div className="grid gap-6">
                                 <div className="grid gap-2">
                                     <Label htmlFor="name">Nama Lengkap</Label>
@@ -51,10 +52,10 @@ export default function Edit({ student }: StudentProps) {
                                         required
                                         autoFocus
                                         tabIndex={1}
+                                        defaultValue={student.name}
                                         autoComplete="name"
                                         name="name"
                                         placeholder="Full name"
-                                        defaultValue={student.name ?? ''}
                                     />
                                     <InputError message={errors.name ? 'Nama wajib diisi' : ''} className="mt-2" />
                                 </div>
@@ -65,32 +66,39 @@ export default function Edit({ student }: StudentProps) {
                                         type="text"
                                         required
                                         tabIndex={2}
+                                        defaultValue={student.nisn ?? ''}
                                         autoComplete="nisn"
                                         name="nisn"
                                         placeholder="NISN"
-                                        defaultValue={student.nisn ?? ''}
                                     />
                                     <InputError message={errors.nisn ? 'NISN wajib diisi dan harus valid' : ''} className="mt-2" />
                                 </div>
+                                {/* Pilih Kelas */}
                                 <div className="grid gap-2">
-                                    <Label htmlFor="class_level">Kelas</Label>
-                                    <Input
-                                        id="class_level"
-                                        type="text"
-                                        required
-                                        tabIndex={2}
-                                        autoComplete="class_level"
-                                        name="class_level"
-                                        placeholder="Kelas"
-                                        defaultValue={student.class_level ?? ''}
-                                    />
-                                    <InputError message={errors.class_level ? 'Kelas wajib diisi dan harus valid' : ''} className="mt-2" />
+                                    <Label htmlFor="kelas_id">Kelas</Label>
+                                    <select
+                                        id="kelas_id"
+                                        name="kelas_id"
+                                        className="h-10 rounded-md border px-3 py-2"
+                                        defaultValue={student.kelas_id ? String(student.kelas_id) : ''}
+                                    >
+                                        <option value="">Pilih Kelas</option>
+                                        {kelas?.map((k) => (
+                                            <option key={k.id} value={k.id}>
+                                                {k.nama_kelas}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <InputError message={errors.kelas_id ? 'Kelas harus valid' : ''} className="mt-2" />
                                 </div>
-
                                 {/* Jenis Kelamin */}
                                 <div className="grid gap-2">
                                     <Label htmlFor="gender">Jenis Kelamin</Label>
-                                    <RadioGroup value={jenisKelamin} onValueChange={setJenisKelamin} className="flex items-center gap-3">
+                                    <RadioGroup
+                                        value={jenisKelamin}
+                                        onValueChange={(val) => setJenisKelamin(val as 'Laki-laki' | 'Perempuan')}
+                                        className="flex items-center gap-3"
+                                    >
                                         {['Laki-Laki', 'Perempuan'].map((jk) => (
                                             <div key={jk} className="flex items-center space-x-2">
                                                 <RadioGroupItem value={jk} id={jk} />
@@ -110,15 +118,13 @@ export default function Edit({ student }: StudentProps) {
                                         name="address"
                                         placeholder="Alamat lengkap"
                                         tabIndex={4}
-                                        required
                                         defaultValue={student.address ?? ''}
                                     />
                                     <InputError message={errors.address ? 'Alamat wajib diisi' : ''} className="mt-2" />
                                 </div>
                                 <div className="grid gap-2">
-                                    <CalendarField defaultDate={student.birth_date} />
+                                    <CalendarField value={student.birth_date ?? undefined} />
                                 </div>
-
                                 <div className="grid gap-2">
                                     <Label htmlFor="parent_name">Nama Orangtua</Label>
                                     <Input
@@ -127,7 +133,6 @@ export default function Edit({ student }: StudentProps) {
                                         name="parent_name"
                                         placeholder="Nama Orangtua"
                                         tabIndex={5}
-                                        required
                                         defaultValue={student.parent_name ?? ''}
                                     />
                                     <InputError message={errors.parent_name ? 'Nama Orangtua wajib diisi' : ''} className="mt-2" />
@@ -142,7 +147,6 @@ export default function Edit({ student }: StudentProps) {
                                         tabIndex={5}
                                         defaultValue={student.parent_occupation ?? ''}
                                     />
-
                                     <InputError message={errors.parent_occupation ? 'Pekerjaan Orangtua wajib diisi' : ''} className="mt-2" />
                                 </div>
                                 <div className="grid gap-2">

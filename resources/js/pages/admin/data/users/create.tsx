@@ -20,7 +20,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function create() {
+export default function Create() {
     const [roles, setRoles] = useState<string[]>([]);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

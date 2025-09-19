@@ -3,22 +3,27 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\DataKelas;
 use App\Models\Student;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
+use Inertia\Inertia; // tambah import
 
 class StudentController extends Controller
 {
     public function index()
     {
-        $students = Student::all();
+        // Eager load relasi kelas agar dapat ditampilkan di tabel
+        $students = Student::with('dataKelas')->get();
 
         return Inertia::render('admin/data/students/index', compact('students'));
     }
 
     public function create()
     {
-        return Inertia::render('admin/data/students/create');
+        // Kirim daftar kelas untuk dipilih pada form
+        $kelas = DataKelas::all();
+
+        return Inertia::render('admin/data/students/create', compact('kelas'));
     }
 
     public function store(Request $request)
@@ -26,7 +31,8 @@ class StudentController extends Controller
         $validated = $request->validate([
             'name' => 'required|string',
             'nisn' => 'required|string|unique:students',
-            'class_level' => 'required|string',
+            // ganti class_level -> kelas_id yang merujuk ke tabel data_kelas
+            'kelas_id' => 'nullable|exists:data_kelas,id',
             'birth_date' => 'required|date',
             'gender' => 'required|in:Laki-Laki,Perempuan',
             'address' => 'required|string',
@@ -42,7 +48,10 @@ class StudentController extends Controller
 
     public function edit(Student $student)
     {
-        return Inertia::render('admin/data/students/edit', compact('student'));
+        // Kirim daftar kelas untuk pilihan, dan data student
+        $kelas = DataKelas::all();
+
+        return Inertia::render('admin/data/students/edit', compact('student', 'kelas'));
     }
 
     public function update(Request $request, Student $student)
@@ -50,7 +59,8 @@ class StudentController extends Controller
         $validated = $request->validate([
             'name' => 'required|string',
             'nisn' => 'required|string|unique:students,nisn,'.$student->id,
-            'class_level' => 'required|string',
+            // ganti class_level -> kelas_id yang merujuk ke tabel data_kelas
+            'kelas_id' => 'nullable|exists:data_kelas,id',
             'birth_date' => 'required|date',
             'gender' => 'required|in:Laki-Laki,Perempuan',
             'address' => 'required|string',
