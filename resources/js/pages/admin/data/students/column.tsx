@@ -41,6 +41,12 @@ export const columns: ColumnDef<Student>[] = [
         filterFn: 'includesString',
     },
     {
+        id: 'halaqah',
+        header: 'Halaqah',
+        accessorFn: (row: Student) => row.datahalaqah?.nama_halaqah ?? '-',
+        filterFn: 'includesString',
+    },
+    {
         accessorKey: 'gender',
         header: 'Jenis Kelamin',
         filterFn: 'includesString',

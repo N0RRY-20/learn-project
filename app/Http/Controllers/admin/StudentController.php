@@ -12,8 +12,8 @@ class StudentController extends Controller
 {
     public function index()
     {
-        // Eager load relasi kelas agar dapat ditampilkan di tabel
-        $students = Student::with('dataKelas')->get();
+        // Eager load relasi kelas dan halaqah agar dapat ditampilkan di tabel
+        $students = Student::with(['dataKelas', 'datahalaqah'])->get();
 
         return Inertia::render('admin/data/students/index', compact('students'));
     }

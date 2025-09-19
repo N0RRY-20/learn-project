@@ -33,9 +33,20 @@ export default function Index({ students }: Indexprops) {
         return Array.from(set).sort((a, b) => a.localeCompare(b));
     }, [students]);
 
+    // Options Halaqah unik dari data
+    const halaqahOptions = useMemo(() => {
+        const set = new Set<string>();
+        students.forEach((s) => {
+            const nama = s.datahalaqah?.nama_halaqah?.trim();
+            if (nama) set.add(nama);
+        });
+        return Array.from(set).sort((a, b) => a.localeCompare(b));
+    }, [students]);
+
     // State filter lokal (hanya untuk kontrol UI)
     const [filterKelas, setFilterKelas] = useState<string>('');
     const [filterGender, setFilterGender] = useState<string>('');
+    const [filterHalaqah, setFilterHalaqah] = useState<string>('');
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -73,6 +84,34 @@ export default function Index({ students }: Indexprops) {
                                         {kelasOptions.map((k) => (
                                             <SelectItem key={k} value={k}>
                                                 {k}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            {/* Filter Halaqah */}
+                            <div className="min-w-[200px]">
+                                <Select
+                                    value={filterHalaqah || undefined}
+                                    onValueChange={(value) => {
+                                        if (value === ALL_VALUE) {
+                                            setFilterHalaqah(ALL_VALUE);
+                                            table.getColumn('halaqah')?.setFilterValue(undefined);
+                                        } else {
+                                            setFilterHalaqah(value);
+                                            table.getColumn('halaqah')?.setFilterValue(value);
+                                        }
+                                    }}
+                                >
+                                    <SelectTrigger aria-label="Filter Halaqah">
+                                        <SelectValue placeholder="Filter Halaqah" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value={ALL_VALUE}>Semua Halaqah</SelectItem>
+                                        {halaqahOptions.map((h) => (
+                                            <SelectItem key={h} value={h}>
+                                                {h}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>

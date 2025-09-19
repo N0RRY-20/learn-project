@@ -77,9 +77,12 @@ export interface Student {
     parent_occupation: string | null; // Bisa string atau null, karena nullable di database
     // kelas_id menyimpan id numerik atau null jika belum memiliki kelas
     kelas_id: number | null;
+    // halaqah_id menyimpan id numerik atau null jika belum memiliki halaqah
+    halaqah_id: number | null;
     // Relasi opsional (payload bisa camelCase atau snake_case)
     dataKelas?: DataKelas | null;
     data_kelas?: DataKelas | null;
+    datahalaqah?: DataHalaqah | null;
 
     // Timestamps dari Laravel
     created_at: string;

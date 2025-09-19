@@ -29,8 +29,44 @@ export default function DetailDialog({ detailData, onClose }: DetailDialogProps)
                 </DialogHeader>
                 <div className="space-y-1 text-sm">
                     <div className="flex">
+                        <span className="w-32 pr-2 text-right font-medium">Nama Lengkap</span>
+                        <span>{detailData.name}</span>
+                    </div>
+                    <div className="flex">
+                        <span className="w-32 pr-2 text-right font-medium">NISN</span>
+                        <span>{detailData.nisn || '-'}</span>
+                    </div>
+                    <div className="flex">
+                        <span className="w-32 pr-2 text-right font-medium">Kelas</span>
+                        <span>{detailData.dataKelas?.nama_kelas || detailData.data_kelas?.nama_kelas || '-'}</span>
+                    </div>
+                    <div className="flex">
+                        <span className="w-32 pr-2 text-right font-medium">Halaqah</span>
+                        <span>{detailData.datahalaqah?.nama_halaqah || '-'}</span>
+                    </div>
+                    <div className="flex">
+                        <span className="w-32 pr-2 text-right font-medium">Jenis Kelamin</span>
+                        <span>{detailData.gender}</span>
+                    </div>
+                    <div className="flex">
                         <span className="w-32 pr-2 text-right font-medium">Tanggal Lahir</span>
                         <span>{detailData.birth_date}</span>
+                    </div>
+                    <div className="flex">
+                        <span className="w-32 pr-2 text-right font-medium">Alamat</span>
+                        <span>{detailData.address || '-'}</span>
+                    </div>
+                    <div className="flex">
+                        <span className="w-32 pr-2 text-right font-medium">Nama Orang Tua</span>
+                        <span>{detailData.parent_name || '-'}</span>
+                    </div>
+                    <div className="flex">
+                        <span className="w-32 pr-2 text-right font-medium">No. Telepon</span>
+                        <span>{detailData.phone_number || '-'}</span>
+                    </div>
+                    <div className="flex">
+                        <span className="w-32 pr-2 text-right font-medium">Pekerjaan Orang Tua</span>
+                        <span>{detailData.parent_occupation || '-'}</span>
                     </div>
                 </div>
             </DialogContent>
